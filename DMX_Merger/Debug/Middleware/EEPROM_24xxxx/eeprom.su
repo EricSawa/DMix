@@ -1,0 +1,5 @@
+eeprom.c:28:6:eeprom_registerCallback	0	static
+eeprom.c:31:6:eeprom_init	0	static
+eeprom.c:37:6:eeprom_write	16	static
+eeprom.c:44:6:eeprom_read	16	static
+eeprom.c:51:6:eeprom_isFree	16	static

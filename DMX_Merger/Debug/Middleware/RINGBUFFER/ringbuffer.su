@@ -1,0 +1,3 @@
+ringbuffer.c:9:9:RINGBUFFER_cIn	12	static
+ringbuffer.c:18:9:RINGBUFFER_cOut	8	static
+ringbuffer.c:29:9:RINGBUFFER_isEmpty	0	static

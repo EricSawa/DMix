@@ -1,0 +1,2 @@
+app_dmx.c:38:6:app_dmx_sendStart	8	static
+app_dmx.c:45:6:HAL_TIM_PeriodElapsedCallback	8	static

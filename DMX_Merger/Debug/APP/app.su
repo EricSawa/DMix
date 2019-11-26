@@ -1,0 +1,6 @@
+app.c:95:9:eepromCallback	32	static
+app.c:63:6:app_main	8	static
+app.c:81:6:app_1ms	8	static
+app.c:109:6:USART1_IRQHandler	0	static
+app.c:113:6:USART2_IRQHandler	0	static
+app.c:117:6:UART4_IRQHandler	0	static
