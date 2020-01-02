@@ -1,7 +1,7 @@
 /*
  * app_dmx.h
  *
- *  Created on: 24.11.2019
+ *  Created on: 31.12.2019
  *      Author: erics
  */
 
@@ -11,11 +11,10 @@
 * Includes
 *******************************************************************************/
 #include <stdint.h>
-#include "gpio.h"
-#include "usart.h"
-#include "tim.h"
-//#include "eal_task.h"
-//#include "app_cfg.h"
+#include <stdbool.h>
+#include "dmx.h"
+#include "eal_task.h"
+#include "configs.h"
 /******************************************************************************
 * Constants
 *******************************************************************************/
@@ -39,7 +38,10 @@
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-void app_dmx_sendStart();
+void app_dmx_init(eal_task_Task *self);
+void app_dmx_process(eal_task_Task *self);
+void app_dmx_cyclic1ms(eal_task_Task *self, bool stat);
+void app_dmx_receiveMsg(eal_task_Task *self, msg_Message *message);
 
 
 #endif /* DMX_APP_DMX_H_ */

@@ -1,9 +1,9 @@
-app_uart.c:11:6:uart_bufferInit	0	static
-app_uart.c:17:6:uart_enableReceiveInt	0	static
-app_uart.c:20:9:uart_getCharFromBuffer	0	static
-app_uart.c:27:9:uart_writeCharToBuffer	8	static
-app_uart.c:35:9:uart_writeStringToBuffer	32	static
-app_uart.c:51:6:uart_irqHandler	24	static
+app_uart.c:11:6:app_uart_bufferInit	0	static
+app_uart.c:17:6:app_uart_enableReceiveInt	0	static
+app_uart.c:20:9:app_uart_getCharFromBuffer	0	static
+app_uart.c:27:9:app_uart_writeCharToBuffer	8	static
+app_uart.c:35:9:app_uart_writeStringToBuffer	32	static
+app_uart.c:51:6:app_uart_irqHandler	24	static
 app_uart.c:79:6:uart_receiveCharBlocking	0	static
 app_uart.c:83:6:uart_transmitCharBlocking	0	static
 app_uart.c:87:6:uart_transmitStringBlocking	16	static

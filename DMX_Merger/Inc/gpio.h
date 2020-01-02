@@ -68,8 +68,8 @@
 void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void gpioConfigureToFloating(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
-void gpioConfigureToPushPull(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+void gpio_ConfigureToFloating(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+void gpio_ConfigureToPushPull(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

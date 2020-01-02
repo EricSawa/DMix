@@ -159,9 +159,9 @@ void MX_TIM3_Init(void)
   TIM_IC_InitTypeDef sConfigIC = {0};
 
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 0;
+  htim3.Init.Prescaler = 80;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 0;
+  htim3.Init.Period = 0xFFFF;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_IC_Init(&htim3) != HAL_OK)
@@ -174,7 +174,7 @@ void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
-  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
   sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
   sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
   sConfigIC.ICFilter = 0;
@@ -620,7 +620,75 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 } 
 
 /* USER CODE BEGIN 1 */
+void tim_setNewTimeAndStart(TIM_TypeDef *tim, uint32_t time){
+	tim->CR1 &= ~TIM_CR1_CEN;	//Stop counter
+	tim->CR1 |= TIM_CR1_UDIS; 	//Avoid that update can be triggered
+	tim->SR &= ~TIM_SR_UIF;		//Kill the last update flag
+	tim->ARR = time;				//Load new time
+	tim->EGR |= TIM_EGR_UG;		//Force reload of shadow register -> Start from beginning
+	tim->CR1 &= ~TIM_CR1_UDIS;	//Allow new updates to be triggered
+	tim->DIER |= TIM_DIER_UIE;	//Enable update interrupts
+	tim->CR1 |= TIM_CR1_CEN;		//Enable counter
+}
+void tim_stop(TIM_TypeDef *tim){
+	tim->CR1 &= ~TIM_CR1_CEN;	//Stop counter
+	tim->CR1 |= TIM_CR1_UDIS; 	//Avoid that update can be triggered
+	tim->SR &= ~TIM_SR_UIF;		//Kill the last update flag
+}
 
+void tim_changePolToRising(TIM_TypeDef *tim, uint32_t ch){
+	if(ch == TIM_CHANNEL_1){
+		tim->CCER &= ~TIM_CCER_CC1E;
+		tim->CCER &= ~TIM_CCER_CC1NP;
+		tim->CCER &= ~TIM_CCER_CC1P;
+		tim->CCER |= TIM_CCER_CC1E;
+	}else if(ch == TIM_CHANNEL_2){
+		tim->CCER &= ~TIM_CCER_CC2E;
+		tim->CCER &= ~TIM_CCER_CC2NP;
+		tim->CCER &= ~TIM_CCER_CC2P;
+		tim->CCER |= TIM_CCER_CC2E;
+	}else if(ch == TIM_CHANNEL_3){
+		tim->CCER &= ~TIM_CCER_CC3E;
+		tim->CCER &= ~TIM_CCER_CC3NP;
+		tim->CCER &= ~TIM_CCER_CC3P;
+		tim->CCER |= TIM_CCER_CC3E;
+	}else if(ch == TIM_CHANNEL_4){
+		tim->CCER &= ~TIM_CCER_CC4E;
+		tim->CCER &= ~TIM_CCER_CC4NP;
+		tim->CCER &= ~TIM_CCER_CC4P;
+		tim->CCER |= TIM_CCER_CC4E;
+	}
+}
+uint8_t tim_isFalling(TIM_TypeDef *tim, uint32_t ch){
+	if(ch == TIM_CHANNEL_1) return (tim->CCER & TIM_CCER_CC1P);
+	else if(ch == TIM_CHANNEL_2) return (tim->CCER & TIM_CCER_CC2P);
+	else if(ch == TIM_CHANNEL_3) return (tim->CCER & TIM_CCER_CC3P);
+	else if(ch == TIM_CHANNEL_4) return (tim->CCER & TIM_CCER_CC4P);
+}
+
+void tim_changePolToFalling(TIM_TypeDef *tim, uint32_t ch){
+	if(ch == TIM_CHANNEL_1){
+		tim->CCER &= ~TIM_CCER_CC1E;
+		tim->CCER &= ~TIM_CCER_CC1NP;
+		tim->CCER = TIM_CCER_CC1P;
+		tim->CCER |= TIM_CCER_CC1E;
+	}else if(ch == TIM_CHANNEL_2){
+		tim->CCER &= ~TIM_CCER_CC2E;
+		tim->CCER &= ~TIM_CCER_CC2NP;
+		tim->CCER = TIM_CCER_CC2P;
+		tim->CCER |= TIM_CCER_CC2E;
+	}else if(ch == TIM_CHANNEL_3){
+		tim->CCER &= ~TIM_CCER_CC3E;
+		tim->CCER &= ~TIM_CCER_CC3NP;
+		tim->CCER = TIM_CCER_CC3P;
+		tim->CCER |= TIM_CCER_CC3E;
+	}else if(ch == TIM_CHANNEL_4){
+		tim->CCER &= ~TIM_CCER_CC4E;
+		tim->CCER &= ~TIM_CCER_CC4NP;
+		tim->CCER = TIM_CCER_CC4P;
+		tim->CCER |= TIM_CCER_CC4E;
+	}
+}
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

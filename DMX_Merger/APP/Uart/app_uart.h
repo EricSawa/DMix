@@ -17,11 +17,11 @@
 #include "ringbuffer.h"
 
 /* Public functions (prototypes) ---------------------------------------------------*/
-void uart_bufferInit(stRingBuf *buf, char *data, uint16_t size);
-void uart_enableReceiveInt(USART_TypeDef *uartHandler);
-uint8_t uart_getCharFromBuffer(char *data, stRingBuf *buf);
-uint8_t uart_writeCharToBuffer(char data, stRingBuf *buf, USART_TypeDef *uartHandler);
-uint8_t uart_writeStringToBuffer(const char *string, stRingBuf *buf, USART_TypeDef *uartHandler);
-void uart_irqHandler(USART_TypeDef *uartHandler, stRingBuf *rxBuf, stRingBuf *txBuf);
+void app_uart_bufferInit(stRingBuf *buf, char *data, uint16_t size);
+void app_uart_enableReceiveInt(USART_TypeDef *uartHandler);
+uint8_t app_uart_getCharFromBuffer(char *data, stRingBuf *buf);
+uint8_t app_uart_writeCharToBuffer(char data, stRingBuf *buf, USART_TypeDef *uartHandler);
+uint8_t app_uart_writeStringToBuffer(const char *string, stRingBuf *buf, USART_TypeDef *uartHandler);
+void app_uart_irqHandler(USART_TypeDef *uartHandler, stRingBuf *rxBuf, stRingBuf *txBuf);
 
 #endif /* UART_APP_UART_H_ */

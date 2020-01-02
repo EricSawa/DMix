@@ -81,7 +81,11 @@ void MX_TIM16_Init(void);
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
                                         
 /* USER CODE BEGIN Prototypes */
-
+void tim_setNewTimeAndStart(TIM_TypeDef *tim, uint32_t time);
+void tim_stop(TIM_TypeDef *tim);
+void tim_changePolToRising(TIM_TypeDef *tim, uint32_t ch);
+void tim_changePolToFalling(TIM_TypeDef *tim, uint32_t ch);
+uint8_t tim_isFalling(TIM_TypeDef *tim, uint32_t ch);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

@@ -11,16 +11,19 @@
 /******************************************************************************
 * Includes
 *******************************************************************************/
+
 #include <stdint.h>
 #include "gpio.h"
 #include "usart.h"
 #include "i2c.h"
 #include "configs.h"
+#include <dmx.h>
 #include "eeprom.h"
 #include "app_uart.h"
 #include "app_dmx.h"
-//#include "eal_task.h"
-//#include "app_cfg.h"
+#include "app_dmx_preset.h"
+#include "eal_task.h"
+#include "app_cfg.h"
 /******************************************************************************
 * Constants
 *******************************************************************************/

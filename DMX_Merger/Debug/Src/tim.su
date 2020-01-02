@@ -11,3 +11,8 @@ tim.c:215:6:MX_TIM15_Init	112	static
 tim.c:480:6:HAL_TIM_PWM_MspDeInit	8	static
 tim.c:516:6:HAL_TIM_IC_MspDeInit	8	static
 tim.c:561:6:HAL_TIM_Base_MspDeInit	0	static
+tim.c:623:6:tim_setNewTimeAndStart	0	static
+tim.c:633:6:tim_stop	0	static
+tim.c:639:6:tim_changePolToRising	0	static
+tim.c:662:9:tim_isFalling	0	static
+tim.c:669:6:tim_changePolToFalling	0	static

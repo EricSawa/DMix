@@ -73,7 +73,8 @@ void MX_USART1_UART_Init(void);
 void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+void app_uart_enableReceiveInt(USART_TypeDef *uartHandler);
+void app_uart_disableReceiveInt(USART_TypeDef *uartHandler);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

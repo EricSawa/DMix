@@ -1,2 +1,9 @@
-app_dmx.c:38:6:app_dmx_sendStart	8	static
-app_dmx.c:45:6:HAL_TIM_PeriodElapsedCallback	8	static
+app_dmx.c:82:6:dmx2ReceiverCallback	0	static
+app_dmx.c:77:6:dmx1TransmitterCallback	0	static
+app_dmx.c:36:6:app_dmx_init	8	static
+app_dmx.c:49:6:app_dmx_process	8	static
+app_dmx.c:58:6:app_dmx_cyclic1ms	0	static
+app_dmx.c:62:6:app_dmx_receiveMsg	8	static
+app_dmx.c:87:6:USART1_IRQHandler	0	static
+app_dmx.c:91:6:USART2_IRQHandler	0	static
+app_dmx.c:94:6:HAL_TIM_PeriodElapsedCallback	0	static

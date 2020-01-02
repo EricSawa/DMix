@@ -1,0 +1,9 @@
+msg.c:40:23:writeMsg	24	static
+msg.c:63:6:msg_initBuffer	0	static
+msg.c:70:9:msg_writeEvent	0	static
+msg.c:76:9:msg_writeAction	0	static
+msg.c:82:14:msg_getNext	24	static
+msg.c:109:9:msg_isAction	0	static
+msg.c:113:9:msg_isEvent	0	static
+msg.c:118:6:msg_killBuffer	0	static
+msg.c:123:14:msg_init	0	static
