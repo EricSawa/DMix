@@ -137,9 +137,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_PWM_Stop(&htim15, TIM_CHANNEL_1);
-  TIM15->CCR4 = 255;
-  HAL_TIM_PWM_Start(&htim15, TIM_CHANNEL_1);
+//  HAL_TIM_PWM_Stop(&htim15, TIM_CHANNEL_1);
+//  TIM15->CCR4 = 255;
+//  HAL_TIM_PWM_Start(&htim15, TIM_CHANNEL_1);
   app_main();
   /* USER CODE END 2 */
 

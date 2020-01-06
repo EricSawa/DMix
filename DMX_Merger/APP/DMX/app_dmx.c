@@ -91,7 +91,4 @@ void USART1_IRQHandler(void){
 void USART2_IRQHandler(void){
 	dmx_irqTxInterfaceHandler(&dmx1);
 }
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	if(htim->Instance == dmx1.txTimer) dmx_irqTxTimerHandler(&dmx1);
-}
 

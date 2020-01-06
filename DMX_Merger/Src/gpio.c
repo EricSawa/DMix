@@ -144,6 +144,46 @@ void gpio_ConfigureToPushPull(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin){
 	HAL_GPIO_Init(GPIOx, &GPIO_InitStruct);
 	HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);
 }
+
+#define INPUT_FLOATING_BIT0 0
+#define INPUT_FLOATING_BIT1 0
+
+#define OUTPUT_OD_BIT0 	1
+#define OUTPUT_OD_BIT1 	0
+
+#define TEST_GPIO_MODE_MSK 0x03
+#define TEST_GPIO_MODE_INPUT_FLOAT 0x00
+#define TEST_GPIO_MODE_OUTPUT_OD 0x01
+
+void gpio_setPinMode(uint8_t mode, GPIO_TypeDef  *GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState){
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	if(mode == GPIO_MODE_INPUT){
+//		uint8_t position = ((GPIO_Pin - 1) << 1)
+//		GPIOx->MODER &= ~(1 << GPIO_Pin);
+
+		GPIO_InitStruct.Pin = GPIO_Pin;
+		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+		GPIO_InitStruct.Pull = GPIO_NOPULL;
+		HAL_GPIO_Init(GPIOx, &GPIO_InitStruct);
+	}else if(mode == GPIO_MODE_OUTPUT_OD){
+		HAL_GPIO_WritePin(GPIOx, GPIO_Pin, PinState);
+		GPIO_InitStruct.Pin = GPIO_Pin;
+		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+		GPIO_InitStruct.Pull = GPIO_NOPULL;
+		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+		HAL_GPIO_Init(GPIOx, &GPIO_InitStruct);
+	}
+}
+
+void gpio_setPinMode2(uint8_t mode, GPIO_TypeDef  *GPIOx, uint8_t GPIO_Pin_BitPos, GPIO_PinState PinState){
+	if(mode == GPIO_MODE_INPUT){
+		GPIOx->MODER &= ~(TEST_GPIO_MODE_MSK << (GPIO_Pin_BitPos << 1));
+		GPIOx->MODER |= (TEST_GPIO_MODE_INPUT_FLOAT << (GPIO_Pin_BitPos << 1));
+	}else{
+		GPIOx->MODER &= ~(TEST_GPIO_MODE_MSK << (GPIO_Pin_BitPos << 1));
+		GPIOx->MODER |= (TEST_GPIO_MODE_OUTPUT_OD << (GPIO_Pin_BitPos << 1));
+	}
+}
 /* USER CODE END 2 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

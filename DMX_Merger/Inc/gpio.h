@@ -70,6 +70,10 @@ void MX_GPIO_Init(void);
 /* USER CODE BEGIN Prototypes */
 void gpio_ConfigureToFloating(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void gpio_ConfigureToPushPull(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+
+
+void gpio_setPinMode(uint8_t mode, GPIO_TypeDef  *GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
+void gpio_setPinMode2(uint8_t mode, GPIO_TypeDef  *GPIOx, uint8_t GPIO_Pin_BitPos, GPIO_PinState PinState);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
