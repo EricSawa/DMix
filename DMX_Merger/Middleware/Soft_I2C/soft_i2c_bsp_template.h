@@ -7,13 +7,19 @@
 
 #ifndef SOFT_I2C_SOFT_I2C_BSP_H_
 #define SOFT_I2C_SOFT_I2C_BSP_H_
-
+/******************************************************************************
+* Enable/Disable
+*******************************************************************************/
+#define SOFT_I2C_BSP_TEMPLATE 1
+#if !SOFT_I2C_BSP_TEMPLATE
 /******************************************************************************
 * Includes
 *******************************************************************************/
 #include <stdint.h>
+#include <stdbool.h>
 #include "gpio.h"
 #include "tim.h"
+
 /******************************************************************************
 * Typedefs
 *******************************************************************************/
@@ -72,6 +78,11 @@ static inline void soft_i2c_bsp_setGpioMode(i2c_bsp_GpioMode mode, soft_i2c_bsp_
 	}
 }
 
+static inline bool soft_i2c_bsp_readGpio(soft_i2c_bsp_pin_device *pin){
+	//TODO: remove HAL
+	return HAL_GPIO_ReadPin(pin->GPIOx, pin->GPIO_Pin);
+}
+
 static inline void soft_i2c_bsp_timInit(soft_i2c_bsp_tim_device *tim){
 	tim->TIMx->CR1 &= ~TIM_CR1_CEN;		//Stop counter
 	tim->TIMx->CR1 |= TIM_CR1_UDIS; 	//Avoid that update can be triggered
@@ -92,3 +103,4 @@ static inline void soft_i2c_bsp_timStop(soft_i2c_bsp_tim_device *tim){
 }
 
 #endif /* SOFT_I2C_SOFT_I2C_BSP_H_ */
+#endif

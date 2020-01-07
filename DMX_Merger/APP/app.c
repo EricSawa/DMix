@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include "main.h"
 #include "app.h"
-
-#include "soft_i2c.h"
 /******************************************************************************
 * Constants
 *******************************************************************************/
@@ -28,15 +26,7 @@
 /******************************************************************************
 * Typedefs
 *******************************************************************************/
-soft_i2c_Config myI2c = {
-		.timer_us = 0,
-		.sda_pin = {.GPIOx = GPIOB, .GPIO_Pin = GPIO_PIN_11, .GPIO_Pin_BitPos = 11},
-		.scl_pin = {.GPIOx = GPIOB, .GPIO_Pin = GPIO_PIN_10, .GPIO_Pin_BitPos = 10},
-		.max_clock_stretching_us = 100000,
-		.clock_stretching_sleep_us = 1000,
-		.baudrate = 200000,
-		.timer = {.TIMx = TIM16},
-};
+
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
@@ -81,7 +71,16 @@ eal_task_Task dmxTask = {
 		.init = app_dmx_init, .mainLoop = app_dmx_process, .timer = app_dmx_cyclic1ms,
 		.sendMsg = sendMessage, .receiveMsg = app_dmx_receiveMsg
 };
-
+eal_task_Task btnTask = {
+		.id = 3, .enable = false,
+		.init = app_btn_init, .mainLoop = app_btn_process, .timer = app_btn_cyclic1ms,
+		.sendMsg = sendMessage, .receiveMsg = app_btn_receiveMsg
+};
+eal_task_Task footcontrolTask = {
+		.id = 4, .enable = false,
+		.init = app_footcontrol_init, .mainLoop = app_footcontrol_process, .timer = NULL,
+		.sendMsg = sendMessage, .receiveMsg = app_footcontrol_receiveMsg
+};
 /******************************************************************************
 * Function Definitions
 *******************************************************************************/
@@ -92,27 +91,16 @@ void app_main(){
 	uint8_t readData[2] = {0};
 
 //	eeprom_read(&eepromDev1, 0, readData, 2);
-	#if SOFT_I2C
-		uint8_t writeData[2] = {0xBA, 0xAB};
-	    gpio_setPinMode(GPIO_MODE_INPUT, myI2c.scl_pin.GPIOx, myI2c.scl_pin.GPIO_Pin, GPIO_PIN_RESET);
-	    gpio_setPinMode(GPIO_MODE_INPUT, myI2c.sda_pin.GPIOx, myI2c.sda_pin.GPIO_Pin, GPIO_PIN_RESET);
-		i2c_soft_init(&myI2c);
-//		eeprom_read(&eepromDev1, 0, readData, 2);
-		eeprom_write(&eepromDev1, 0, writeData, 2);
-	#else
-		eeprom_read(&eepromDev1, 0, readData, 2);
-		uint8_t writeData[2] = {0xEE, 0xEE};
-		eeprom_write(&eepromDev1, 0, writeData, 2);
-	#endif
+	uint8_t writeData[2] = {0xBA, 0xAB};
+	i2c_soft_init(&softI2C2);
+//	eeprom_read(&eepromDev1, 0, readData, 2);
+	eeprom_write(&eepromDev1, 0, writeData, 2);
 	while (1){
 		msgTask.mainLoop(&msgTask);
+		btnTask.mainLoop(&btnTask);
+		footcontrolTask.mainLoop(&footcontrolTask);
 //		dmxTask.mainLoop(&dmxTask);
 //		dmxPresetTask.mainLoop(&dmxPresetTask);
-		if((HAL_GPIO_ReadPin(I_SW2_GPIO_Port, I_SW2_Pin) == GPIO_PIN_RESET) && (myPresets[0].trigger != true)){
-			msg_Message newMessage = msg_LITERAL(app_cfg_DMX_PRESET_MSG, msg_ACTION(0), app_cfg_dmx_preset_TRIGGER_ENABLE, 0, 0);
-			sendMessage(NULL, &newMessage);
-		}
-
 	 }
 }
 
@@ -122,6 +110,7 @@ void app_1ms(){
 	dmx_1ms(&dmx1);
 	if(dmxTask.timer) dmxTask.timer(&dmxTask, true);
 	if(dmxPresetTask.timer) dmxPresetTask.timer(&dmxPresetTask, true);
+	if(btnTask.timer) btnTask.timer(&btnTask, true);
 	if(++timer100ms >= 100){
 		timer100ms = 0;
 //		uart_writeStringToBuffer("AT+NAMEERIC12  ", &uart4TxBuf, huart4.Instance);
@@ -143,19 +132,22 @@ static void app_process(eal_task_Task *self){
 static void app_receiveMsg(eal_task_Task *self, msg_Message *message){
 	dmxTask.receiveMsg(&dmxTask, message);
 	dmxPresetTask.receiveMsg(&dmxPresetTask, message);
+	btnTask.receiveMsg(&btnTask, message);
+	footcontrolTask.receiveMsg(&footcontrolTask, message);
 }
 
 static void app_init(eal_task_Task *self){
-
-
 	eeprom_registerCallback(&eepromDev1, eepromCallback);
 	eeprom_init(&eepromDev1);
-
-
 //	dmxTask.enable = true;
 //	if(dmxTask.init) dmxTask.init(&dmxTask);
 //	dmxPresetTask.enable = true;
 //	if(dmxPresetTask.init) dmxPresetTask.init(&dmxPresetTask);
+	btnTask.enable = true;
+	if(btnTask.init) btnTask.init(&btnTask);
+	footcontrolTask.enable = true;
+	if(footcontrolTask.init) footcontrolTask.init(&footcontrolTask);
+
 }
 
 /* Messages --------------------------------------------------------------------*/
@@ -173,24 +165,14 @@ static void messageBufferError(uint8_t state){
 /* Callback's ---------------------------------------------------------------------*/
 uint8_t eepromCallback(eeprom_cfg_Config *config){
 	uint8_t state = 1;
-	volatile int state2 = 0;
 	if(config->callbackType == EEPROM_CFG_CALL_TX_START){
-	#if SOFT_I2C
-//		state2 = i2c_soft_write(&myI2c, config->devAddr, config->txBuffer, config->dataSize);
-		state2 = i2c_soft_mem_write(&myI2c, config->devAddr, config->memAddr, I2C_MEMADD_SIZE_16BIT, config->txBuffer, config->dataSize);
-	#else
-		if(HAL_I2C_Mem_Write(&hi2c2, config->devAddr, config->memAddr, I2C_MEMADD_SIZE_16BIT, config->txBuffer, config->dataSize, 100) != HAL_OK) state = 0;
-	#endif
+		if(i2c_soft_mem_write(&softI2C2, config->devAddr, config->memAddr, I2C_MEMADD_SIZE_16BIT, config->txBuffer, config->dataSize) != soft_i2c_RETURN_OK) state = 0;
 	}
 	if(config->callbackType == EEPROM_CFG_CALL_RX_START){
-	#if SOFT_I2C
-		state2 = i2c_soft_mem_read(&myI2c, config->devAddr, config->memAddr, I2C_MEMADD_SIZE_16BIT, config->rxBuffer, config->dataSize);
-	#else
-		if(HAL_I2C_Mem_Read(&hi2c2, config->devAddr, config->memAddr, I2C_MEMADD_SIZE_16BIT, config->rxBuffer, config->dataSize, 10) != HAL_OK) state = 0;
-	#endif
-
+		if(i2c_soft_mem_read(&softI2C2, config->devAddr, config->memAddr, I2C_MEMADD_SIZE_16BIT, config->rxBuffer, config->dataSize) != soft_i2c_RETURN_OK) state = 0;
 	}
 	if(config->callbackType == EEPROM_CFG_CALL_CHECK_TX_STATE){
+		//TODO: Change to soft i2c
 		if(HAL_I2C_Master_Transmit(&hi2c2, config->devAddr, config->rxBuffer, config->dataSize, 1) != HAL_OK) state = 0;
 	}
 	return state;
@@ -202,23 +184,12 @@ void UART4_IRQHandler(void){
 }
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim->Instance == dmx1.txTimer) dmx_irqTxTimerHandler(&dmx1);
-//	if(htim->Instance == TIM16) i2c_soft_timer_us(&myI2c);
 }
 
-bool toggle = false;
 void TIM1_UP_TIM16_IRQHandler(void){
   if (__HAL_TIM_GET_FLAG(&htim16, TIM_FLAG_UPDATE) != RESET){
 	  __HAL_TIM_CLEAR_IT(&htim16, TIM_IT_UPDATE);
-//	  if(toggle){
-//		  gpio_setPinMode2(GPIO_MODE_INPUT, myI2c.sda_p.GPIOx, myI2c.sda_p.GPIO_Pin_BitPos, GPIO_PIN_RESET);
-//		  toggle= false;
-//	  }else{
-//		 gpio_setPinMode2(GPIO_MODE_OUTPUT_OD, myI2c.sda_p.GPIOx, myI2c.sda_p.GPIO_Pin_BitPos, GPIO_PIN_RESET);
-//		 toggle= true;
-//	  }
-
-	  i2c_soft_timer_us(&myI2c);
-
+	  i2c_soft_timer_us(&softI2C2);
   }
 }
 

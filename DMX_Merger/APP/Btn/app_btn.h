@@ -1,25 +1,28 @@
 /*
- * soft_i2c.h
+ * app_btn.h
  *
- *  Created on: 04.01.2020
+ *  Created on: 26.01.2019
  *      Author: erics
  */
 
-#ifndef SOFT_I2C_SOFT_I2C_H_
-#define SOFT_I2C_SOFT_I2C_H_
+#ifndef BTN_APP_BTN_H_
+#define BTN_APP_BTN_H_
 /******************************************************************************
 * Includes
 *******************************************************************************/
-#include "soft_i2c_cfg.h"
+#include <stdint.h>
+#include <string.h>
+#include <stdbool.h>
+#include "app_cfg.h"
+#include "configs.h"
+#include "eal_task.h"
+#include "main.h"
 /******************************************************************************
-* Return values
+* Constants
 *******************************************************************************/
-enum{
-	soft_i2c_RETURN_CLOCK_STRETCH = -3,
-	soft_i2c_RETURN_BUSY = -2,
-	soft_i2c_RETURN_NACK = -1,
-	soft_i2c_RETURN_OK = 0,
-};
+#define app_btn_NONE		0xFF
+#define app_btn_NMBR_REG	0
+#define app_btn_NMBR_OTH	app_cfg_NMBR_BTNS
 /******************************************************************************
 * Typedefs
 *******************************************************************************/
@@ -31,17 +34,10 @@ enum{
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-void i2c_soft_init(soft_i2c_cfg_Config *self);
-
-int i2c_soft_read(soft_i2c_cfg_Config *self, int address, uint8_t *data, int size);
-int i2c_soft_mem_read(soft_i2c_cfg_Config *self, int address, int memAddr, int memAddrSize, uint8_t *data, int size);
-
-int i2c_soft_write(soft_i2c_cfg_Config *self, int address, const uint8_t *data, int size);
-int i2c_soft_mem_write(soft_i2c_cfg_Config *self, int address, int memAddr, int memAddrSize, const uint8_t *data, int size);
-
-int i2c_soft_scan(soft_i2c_cfg_Config *self, int address);
-
-void i2c_soft_timer_us(soft_i2c_cfg_Config *self);
+void app_btn_init(eal_task_Task *self);
+void app_btn_process(eal_task_Task *self);
+void app_btn_cyclic1ms(eal_task_Task *self, bool stat);
+void app_btn_receiveMsg(eal_task_Task *self, msg_Message *message);
 
 
-#endif /* SOFT_I2C_SOFT_I2C_H_ */
+#endif /* BTN_APP_BTN_H_ */
