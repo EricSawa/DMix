@@ -223,26 +223,26 @@ static int wait_for_clock_stretching_end(soft_i2c_cfg_Config *self){
 }
 
 static int start_cond(soft_i2c_cfg_Config *self){
-	gpio_setPinMode(GPIO_MODE_INPUT, self->scl_pin.GPIOx, self->scl_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+	soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_INPUT, &self->scl_pin);
 	/* The line is busy if SDA is low. */
-	gpio_setPinMode(GPIO_MODE_INPUT, self->sda_pin.GPIOx, self->sda_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+	soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_INPUT, &self->sda_pin);
     if (soft_i2c_bsp_readGpio(&self->sda_pin) == 0) {
         return soft_i2c_RETURN_BUSY;
     }
     /* SCL is high, set SDA from 1 to 0. */
-    gpio_setPinMode(GPIO_MODE_OUTPUT_OD, self->sda_pin.GPIOx, self->sda_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_OUTPUT, &self->sda_pin);
     busy_wait_us(self, self->baudrate_us);
     /* Set SCL low as preparation for the first transfer. */
-    gpio_setPinMode(GPIO_MODE_OUTPUT_OD, self->scl_pin.GPIOx, self->scl_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_OUTPUT, &self->scl_pin);
     return soft_i2c_RETURN_OK;
 }
 
 static int stop_cond(soft_i2c_cfg_Config *self){
     /* Set SDA to 0. */
-    gpio_setPinMode(GPIO_MODE_OUTPUT_OD, self->sda_pin.GPIOx, self->sda_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_OUTPUT, &self->sda_pin);
     busy_wait_us(self, self->baudrate_us);
     /* SDA to 1. */
-    gpio_setPinMode(GPIO_MODE_INPUT, self->scl_pin.GPIOx, self->scl_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_INPUT, &self->scl_pin);
     /* Clock stretching. */
     if (wait_for_clock_stretching_end(self) != soft_i2c_RETURN_OK) {
         return soft_i2c_RETURN_CLOCK_STRETCH;
@@ -250,7 +250,7 @@ static int stop_cond(soft_i2c_cfg_Config *self){
     /* Stop bit setup time, minimum 4us. */
     busy_wait_us(self, self->baudrate_us);
     /* SCL is high, set SDA from 0 to 1. */
-    gpio_setPinMode(GPIO_MODE_INPUT, self->sda_pin.GPIOx, self->sda_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_INPUT, &self->sda_pin);
     busy_wait_us(self, self->baudrate_us);
     /* Make sure no device is pulling SDA low. */
     if (soft_i2c_bsp_readGpio(&self->sda_pin) == 0) {
@@ -261,12 +261,12 @@ static int stop_cond(soft_i2c_cfg_Config *self){
 }
 
 static int write_bit(soft_i2c_cfg_Config *self, int value){
-    if (value == 1) gpio_setPinMode(GPIO_MODE_INPUT, self->sda_pin.GPIOx, self->sda_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
-    else gpio_setPinMode(GPIO_MODE_OUTPUT_OD, self->sda_pin.GPIOx, self->sda_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    if (value == 1) soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_INPUT, &self->sda_pin);
+    else soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_OUTPUT, &self->sda_pin);
     /* SDA change propagation delay. */
     busy_wait_us(self, self->baudrate_us);
     /* Set SCL high to indicate a new valid SDA value is available */
-    gpio_setPinMode(GPIO_MODE_INPUT, self->scl_pin.GPIOx, self->scl_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_INPUT, &self->scl_pin);
     /* Wait for SDA value to be read by slave, minimum of 4us for
        standard mode. */
     busy_wait_us(self, self->baudrate_us);
@@ -275,18 +275,18 @@ static int write_bit(soft_i2c_cfg_Config *self, int value){
         return soft_i2c_RETURN_CLOCK_STRETCH;
     }
     /* Clear the SCL to low in preparation for next change. */
-    gpio_setPinMode(GPIO_MODE_OUTPUT_OD, self->scl_pin.GPIOx, self->scl_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_OUTPUT, &self->scl_pin);
     return soft_i2c_RETURN_OK;
 }
 
 static int read_bit(soft_i2c_cfg_Config *self, uint8_t *value_p){
     /* Let the slave drive data. */
-    gpio_setPinMode(GPIO_MODE_INPUT, self->sda_pin.GPIOx, self->sda_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_INPUT, &self->sda_pin);
     /* Wait for SDA value to be written by slave, minimum of 4us for
        standard mode. */
     busy_wait_us(self, self->baudrate_us);
     /* Set SCL high to indicate a new valid SDA value is available. */
-    gpio_setPinMode(GPIO_MODE_INPUT, self->scl_pin.GPIOx, self->scl_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_INPUT, &self->scl_pin);
     /* Clock stretching. */
     if (wait_for_clock_stretching_end(self) != soft_i2c_RETURN_OK) {
         return soft_i2c_RETURN_CLOCK_STRETCH;
@@ -297,7 +297,7 @@ static int read_bit(soft_i2c_cfg_Config *self, uint8_t *value_p){
     /* SCL is high, read out bit. */
     *value_p = soft_i2c_bsp_readGpio(&self->sda_pin);
     /* Set SCL low in preparation for next operation. */
-    gpio_setPinMode(GPIO_MODE_OUTPUT_OD, self->scl_pin.GPIOx, self->scl_pin.GPIO_Pin_BitPos, GPIO_PIN_RESET);
+    soft_i2c_bsp_setGpioMode(soft_i2c_bsp_GPIO_MODE_OUTPUT, &self->scl_pin);
     return soft_i2c_RETURN_OK;
 }
 

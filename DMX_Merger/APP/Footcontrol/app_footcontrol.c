@@ -12,6 +12,11 @@
 * Configuration
 *******************************************************************************/
 typedef enum{
+	app_footcontrol_ACTIVE,
+	app_footcontrol_INACTIVE
+}app_footcontrol_Status;
+
+typedef enum{
 	app_footcontrol_GPIO_INPUT,
 	app_footcontrol_GPIO_OUTPUT
 }app_footcontrol_GpioMode;
@@ -29,9 +34,13 @@ typedef struct{
 	app_footcontrol_PresetCfg holdLong;
 }app_footcontrol_GpioCfg;
 
+
+/*User access*/
+app_footcontrol_Status status = app_footcontrol_ACTIVE;
+
 app_footcontrol_GpioCfg myGpios[app_cfg_NMBR_BTNS] = {
 	{.mode = app_footcontrol_GPIO_INPUT,
-	.press = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
+	.press = {.presetNr = 0, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
 	.release = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
 	.holdShort = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
 	.holdLong = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
@@ -78,7 +87,7 @@ static void sendDmxPreset(eal_task_Task *self, app_footcontrol_PresetCfg *preset
 * Function Definitions
 *******************************************************************************/
 void app_footcontrol_init(eal_task_Task *self){
-
+	status = app_footcontrol_ACTIVE;
 }
 
 void app_footcontrol_process(eal_task_Task *self){
@@ -94,6 +103,7 @@ void app_footcontrol_cyclic1ms(eal_task_Task *self, bool stat){
 }
 
 void app_footcontrol_receiveMsg(eal_task_Task *self, msg_Message *message){
+	if(status != app_footcontrol_ACTIVE) return;
 	/*Button message parsing*/
 	if(message->type == app_cfg_BTN_MSG){
 		/*Action parsing*/

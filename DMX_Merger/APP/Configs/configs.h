@@ -17,8 +17,8 @@
 
 /*General Instances*/
 extern eeprom_cfg_Config eepromDev1;
-extern dmx_cfg_Instance dmx1;
-extern dmx_cfg_Instance dmx2;
+extern dmx_cfg_Instance dmx1Out;
+extern dmx_cfg_Instance dmx2In;
 extern soft_i2c_cfg_Config softI2C2;
 
 /*Application Instances*/

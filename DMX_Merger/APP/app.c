@@ -88,26 +88,19 @@ eal_task_Task footcontrolTask = {
 void app_main(){
 	msgTask.enable = true;
 	msgTask.init(&msgTask);
-	uint8_t readData[2] = {0};
-
-//	eeprom_read(&eepromDev1, 0, readData, 2);
-	uint8_t writeData[2] = {0xBA, 0xAB};
-	i2c_soft_init(&softI2C2);
-//	eeprom_read(&eepromDev1, 0, readData, 2);
-	eeprom_write(&eepromDev1, 0, writeData, 2);
 	while (1){
 		msgTask.mainLoop(&msgTask);
 		btnTask.mainLoop(&btnTask);
 		footcontrolTask.mainLoop(&footcontrolTask);
-//		dmxTask.mainLoop(&dmxTask);
-//		dmxPresetTask.mainLoop(&dmxPresetTask);
+		dmxTask.mainLoop(&dmxTask);
+		dmxPresetTask.mainLoop(&dmxPresetTask);
 	 }
 }
 
 void app_1ms(){
 	static uint16_t timer100ms = 0;
 	static uint16_t timer500ms = 0;
-	dmx_1ms(&dmx1);
+	dmx_1ms(&dmx1Out);
 	if(dmxTask.timer) dmxTask.timer(&dmxTask, true);
 	if(dmxPresetTask.timer) dmxPresetTask.timer(&dmxPresetTask, true);
 	if(btnTask.timer) btnTask.timer(&btnTask, true);
@@ -137,12 +130,13 @@ static void app_receiveMsg(eal_task_Task *self, msg_Message *message){
 }
 
 static void app_init(eal_task_Task *self){
+	i2c_soft_init(&softI2C2);
 	eeprom_registerCallback(&eepromDev1, eepromCallback);
 	eeprom_init(&eepromDev1);
-//	dmxTask.enable = true;
-//	if(dmxTask.init) dmxTask.init(&dmxTask);
-//	dmxPresetTask.enable = true;
-//	if(dmxPresetTask.init) dmxPresetTask.init(&dmxPresetTask);
+	dmxTask.enable = true;
+	if(dmxTask.init) dmxTask.init(&dmxTask);
+	dmxPresetTask.enable = true;
+	if(dmxPresetTask.init) dmxPresetTask.init(&dmxPresetTask);
 	btnTask.enable = true;
 	if(btnTask.init) btnTask.init(&btnTask);
 	footcontrolTask.enable = true;
@@ -172,8 +166,7 @@ uint8_t eepromCallback(eeprom_cfg_Config *config){
 		if(i2c_soft_mem_read(&softI2C2, config->devAddr, config->memAddr, I2C_MEMADD_SIZE_16BIT, config->rxBuffer, config->dataSize) != soft_i2c_RETURN_OK) state = 0;
 	}
 	if(config->callbackType == EEPROM_CFG_CALL_CHECK_TX_STATE){
-		//TODO: Change to soft i2c
-		if(HAL_I2C_Master_Transmit(&hi2c2, config->devAddr, config->rxBuffer, config->dataSize, 1) != HAL_OK) state = 0;
+		if(i2c_soft_write(&softI2C2, config->devAddr, config->rxBuffer, config->dataSize) != soft_i2c_RETURN_OK) state = 0;
 	}
 	return state;
 }
@@ -183,7 +176,7 @@ void UART4_IRQHandler(void){
 	app_uart_irqHandler(huart4.Instance, &uart4RxBuf, &uart4TxBuf);
 }
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	if(htim->Instance == dmx1.txTimer) dmx_irqTxTimerHandler(&dmx1);
+	if(htim->Instance == dmx1Out.txTimer) dmx_irqTxTimerHandler(&dmx1Out);
 }
 
 void TIM1_UP_TIM16_IRQHandler(void){

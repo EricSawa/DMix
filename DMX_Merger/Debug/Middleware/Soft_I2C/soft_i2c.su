@@ -1,4 +1,5 @@
 soft_i2c_bsp.h:54:20:soft_i2c_bsp_gpioInit	16	static
+soft_i2c_bsp.h:71:20:soft_i2c_bsp_setGpioMode	16	static
 soft_i2c_bsp.h:81:20:soft_i2c_bsp_readGpio	16	static
 soft_i2c_bsp.h:86:20:soft_i2c_bsp_timInit	16	static
 soft_i2c_bsp.h:95:20:soft_i2c_bsp_timStart	16	static

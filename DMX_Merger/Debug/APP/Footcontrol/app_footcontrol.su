@@ -1,5 +1,5 @@
-app_footcontrol.c:80:6:app_footcontrol_init	16	static
-app_footcontrol.c:84:6:app_footcontrol_process	16	static
-app_footcontrol.c:91:6:app_footcontrol_cyclic1ms	16	static
-app_footcontrol.c:96:6:app_footcontrol_receiveMsg	24	static
-app_footcontrol.c:117:13:sendDmxPreset	24	static
+app_footcontrol.c:89:6:app_footcontrol_init	16	static
+app_footcontrol.c:93:6:app_footcontrol_process	16	static
+app_footcontrol.c:100:6:app_footcontrol_cyclic1ms	16	static
+app_footcontrol.c:105:6:app_footcontrol_receiveMsg	24	static
+app_footcontrol.c:127:13:sendDmxPreset	24	static

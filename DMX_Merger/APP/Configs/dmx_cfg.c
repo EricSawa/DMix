@@ -14,7 +14,7 @@
 uint8_t dmx1Universe[512] = {0};
 uint8_t dmx2Universe[512] = {0};
 /* Instances -----------------------------------------------------------------*/
-dmx_cfg_Instance dmx1 = {
+dmx_cfg_Instance dmx1Out = {
 		.type = dmx_cfg_TYPE_TRANSMITTER,
 		/*Tx definitions*/
 		.txState = dmx_cfg_TX_STATE_NONE,
@@ -32,7 +32,7 @@ dmx_cfg_Instance dmx1 = {
 //		.universeSize = 5,
 };
 
-dmx_cfg_Instance dmx2 = {
+dmx_cfg_Instance dmx2In = {
 		.type = dmx_cfg_TYPE_RECEIVER,
 		/*Rx definitions*/
 		.rxState = dmx_cfg_RX_STATE_NONE,
