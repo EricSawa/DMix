@@ -1,0 +1,3 @@
+[submodule "DMX_Merger/Middleware/JSMN"]
+	path = DMX_Merger/Middleware/JSMN
+	url = https://github.com/zserge/jsmn.git

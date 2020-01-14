@@ -11,6 +11,9 @@
 #include <stdlib.h>
 #include "main.h"
 #include "app.h"
+#define JSMN_HEADER
+#include "jsmn.h"
+
 /******************************************************************************
 * Constants
 *******************************************************************************/
@@ -46,15 +49,6 @@ static void app_receiveMsg(eal_task_Task *self, msg_Message *message);
 #define MSG_BUF_SIZE 512
 char MSG_Data[MSG_BUF_SIZE] = {0};
 msg_Buffer msgBuf = msg_BUF(MSG_Data, MSG_BUF_SIZE);
-
-#define UART_TX_SIZE 1024
-#define UART_RX_SIZE 1024
-char uart4TxData[UART_TX_SIZE] = {0};
-char uart4RxData[UART_RX_SIZE] = {0};
-
-stRingBuf uart4TxBuf = {.data = uart4TxData, .size = UART_TX_SIZE, .in = 0, .out = 0};
-stRingBuf uart4RxBuf = {.data = uart4RxData, .size = UART_RX_SIZE, .in = 0, .out = 0};
-
 /* Tasks ---------------------------------------------------------------------*/
 eal_task_Task msgTask = {
 		.id = 0, .enable = false,
@@ -81,6 +75,11 @@ eal_task_Task footcontrolTask = {
 		.init = app_footcontrol_init, .mainLoop = app_footcontrol_process, .timer = NULL,
 		.sendMsg = sendMessage, .receiveMsg = app_footcontrol_receiveMsg
 };
+eal_task_Task interfaceTask = {
+		.id = 5, .enable = false,
+		.init = app_interface_init, .mainLoop = app_interface_process, .timer = NULL,
+		.sendMsg = sendMessage, .receiveMsg = app_interface_receiveMsg
+};
 /******************************************************************************
 * Function Definitions
 *******************************************************************************/
@@ -92,22 +91,23 @@ void app_main(){
 		msgTask.mainLoop(&msgTask);
 		btnTask.mainLoop(&btnTask);
 		footcontrolTask.mainLoop(&footcontrolTask);
+
 		dmxTask.mainLoop(&dmxTask);
 		dmxPresetTask.mainLoop(&dmxPresetTask);
+		interfaceTask.mainLoop(&interfaceTask);
 	 }
 }
 
 void app_1ms(){
 	static uint16_t timer100ms = 0;
 	static uint16_t timer500ms = 0;
+	app_usb_1ms();
 	dmx_1ms(&dmx1Out);
 	if(dmxTask.timer) dmxTask.timer(&dmxTask, true);
 	if(dmxPresetTask.timer) dmxPresetTask.timer(&dmxPresetTask, true);
 	if(btnTask.timer) btnTask.timer(&btnTask, true);
 	if(++timer100ms >= 100){
 		timer100ms = 0;
-//		uart_writeStringToBuffer("AT+NAMEERIC12  ", &uart4TxBuf, huart4.Instance);
-//		uart_writeStringToBuffer("AT+NAMEERIC12  ", &uart2TxBuf, huart2.Instance);
 	}
 	if(++timer500ms >= 500){
 		timer500ms = 0;
@@ -127,6 +127,7 @@ static void app_receiveMsg(eal_task_Task *self, msg_Message *message){
 	dmxPresetTask.receiveMsg(&dmxPresetTask, message);
 	btnTask.receiveMsg(&btnTask, message);
 	footcontrolTask.receiveMsg(&footcontrolTask, message);
+	interfaceTask.receiveMsg(&interfaceTask, message);
 }
 
 static void app_init(eal_task_Task *self){
@@ -141,6 +142,8 @@ static void app_init(eal_task_Task *self){
 	if(btnTask.init) btnTask.init(&btnTask);
 	footcontrolTask.enable = true;
 	if(footcontrolTask.init) footcontrolTask.init(&footcontrolTask);
+	interfaceTask.enable = true;
+	if(interfaceTask.init) interfaceTask.init(&interfaceTask);
 
 }
 
@@ -172,9 +175,6 @@ uint8_t eepromCallback(eeprom_cfg_Config *config){
 }
 
 /* IRQs ---------------------------------------------------------------------*/
-void UART4_IRQHandler(void){
-	app_uart_irqHandler(huart4.Instance, &uart4RxBuf, &uart4TxBuf);
-}
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim->Instance == dmx1Out.txTimer) dmx_irqTxTimerHandler(&dmx1Out);
 }
@@ -186,6 +186,12 @@ void TIM1_UP_TIM16_IRQHandler(void){
   }
 }
 
-
+bool usbConnected = false;
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	if(GPIO_Pin == I_USB_VBUS_Pin) {
+		if(HAL_GPIO_ReadPin(I_USB_VBUS_GPIO_Port, I_USB_VBUS_Pin)) usbConnected = true;
+		else usbConnected = false;
+	}
+}
 
 

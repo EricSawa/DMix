@@ -1,9 +1,9 @@
 app_dmx.c:60:6:app_dmx_init	16	static
 app_dmx.c:81:6:app_dmx_process	16	static
-app_dmx.c:94:6:app_dmx_cyclic1ms	16	static
-app_dmx.c:98:6:app_dmx_receiveMsg	24	static
-app_dmx.c:112:13:updateDmxOut	16	static
-app_dmx.c:131:6:dmx1TransmitterCallback	24	static
-app_dmx.c:137:6:dmx2ReceiverCallback	24	static
-app_dmx.c:142:6:USART1_IRQHandler	8	static
-app_dmx.c:146:6:USART2_IRQHandler	8	static
+app_dmx.c:96:6:app_dmx_cyclic1ms	16	static
+app_dmx.c:100:6:app_dmx_receiveMsg	24	static
+app_dmx.c:114:13:updateDmxOut	16	static
+app_dmx.c:133:6:dmx1TransmitterCallback	24	static
+app_dmx.c:139:6:dmx2ReceiverCallback	24	static
+app_dmx.c:144:6:USART1_IRQHandler	8	static
+app_dmx.c:148:6:USART2_IRQHandler	8	static

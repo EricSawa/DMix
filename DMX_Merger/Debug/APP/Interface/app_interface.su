@@ -1,0 +1,6 @@
+app_interface.c:42:6:app_interface_init	16	static
+app_interface.c:52:6:app_interface_process	16	static
+app_interface.c:59:6:app_interface_cyclic1ms	16	static
+app_interface.c:64:6:app_interface_receiveMsg	16	static
+app_interface.c:68:13:usbToBluetoothBridge	16	static
+app_interface.c:76:6:UART4_IRQHandler	8	static

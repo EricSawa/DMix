@@ -108,6 +108,7 @@ void Error_Handler(void);
 #define O_PWM_LED3_GPIO_Port GPIOA
 #define I_USB_VBUS_Pin GPIO_PIN_9
 #define I_USB_VBUS_GPIO_Port GPIOA
+#define I_USB_VBUS_EXTI_IRQn EXTI9_5_IRQn
 #define I_SW2_Pin GPIO_PIN_10
 #define I_SW2_GPIO_Port GPIOA
 #define O_BT_PWR_Pin GPIO_PIN_15

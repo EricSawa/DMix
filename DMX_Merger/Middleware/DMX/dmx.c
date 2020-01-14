@@ -102,13 +102,13 @@ void dmx_txStop(dmx_cfg_Instance *dmx){
 
 void dmx_rxStart(dmx_cfg_Instance *dmx){
 	if(dmx->type != dmx_cfg_TYPE_RECEIVER) return;
-	uart_enableReceiveInt(dmx->uart);
+	app_uart_enableReceiveInt(dmx->uart);
 	dmx->rxState = dmx_cfg_RX_STATE_WAIT_FOR_BREAK;
 }
 
 void dmx_rxStop(dmx_cfg_Instance *dmx){
 	if(dmx->type != dmx_cfg_TYPE_RECEIVER) return;
-	uart_disableReceiveInt(dmx->uart);
+	app_uart_disableReceiveInt(dmx->uart);
 	dmx->rxState = dmx_cfg_RX_STATE_NONE;
 }
 

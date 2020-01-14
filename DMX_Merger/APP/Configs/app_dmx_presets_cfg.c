@@ -14,84 +14,80 @@
 app_dmx_preset_cfg_Preset myPresets[app_cfg_NMBR_PRESETS] = {
 	{.presetTransitionSettings =
 		{
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 255, 4000, 0, 0, true),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 5000, 0, true),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(3, 0, 110, 0, 0, 0, true), /*Color*/
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(1, 0, 255, 0, 0, 0, true), /*Dimmer*/
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		}
+	},
+	{.presetTransitionSettings =
+		{
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(3, 0, 0, 0, 0, 0, true),	/*Color*/
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(1, 0, 0, 0, 0, 0, true),	/*Dimmer*/
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(2, 0, 0, 0, 0, 0, true),	/*Strobe*/
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		}
+	},
+	{.presetTransitionSettings =
+		{
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(3, 0, 14, 0, 0, 0, true),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(3, 0, 0, 0, 2000, 0, true),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(1, 0, 255, 0, 0, 0, true),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(1, 0, 0, 0, 2000, 0, true),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 255, 0, 0, 0, true), 	/*FOG*/
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 2000, 0, true),	/*FOG*/
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
+		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
 
+		}
+	},
+	{.presetTransitionSettings =
+		{
 		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(2, 0, 255, 0, 0, 0, true),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(1, 0, 0, 0, 5000, 0, true),
-
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(4, 0, 255, 4000, 1000, 0, true),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(4, 0, 0, 0, 5000, 0, true),
-
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(1, 0, 255, 4000, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(1, 0, 0, 0, 0, 0, false),
-
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		}
-	},
-	{.presetTransitionSettings =
-		{
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		}
-	},
-	{.presetTransitionSettings =
-		{
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
-		}
-	},
-	{.presetTransitionSettings =
-		{
-		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
 		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
 		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),
 		app_dmx_preset_cfg_TRANSITION_SETTINGS_LITERAL(0, 0, 0, 0, 0, 0, false),

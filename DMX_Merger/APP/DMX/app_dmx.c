@@ -82,6 +82,8 @@ void app_dmx_process(eal_task_Task *self){
 	if(!self->enable) return;
 	if(!cyclicFlag) return;
 	/*Do everything what you want to do*/
+//	dmx1Out.universe[1] = 255;
+//	dmx1Out.universe[3] = 10;
 	dmx_loop(&dmx1Out);
 	/*Receive makes only sense if merge is enabled*/
 	if(dmxMerge == app_dmx_MERGE_ACTIVE) dmx_loop(&dmx2In);

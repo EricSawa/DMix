@@ -15,7 +15,7 @@
 
 #include "main.h"
 #include "ringbuffer.h"
-
+#include "app_uart.h"
 /* Public functions (prototypes) ---------------------------------------------------*/
 void app_uart_bufferInit(stRingBuf *buf, char *data, uint16_t size);
 void app_uart_enableReceiveInt(USART_TypeDef *uartHandler);

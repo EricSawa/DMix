@@ -20,11 +20,11 @@
 #include <dmx.h>
 #include "soft_i2c.h"
 #include "eeprom.h"
-#include "app_uart.h"
 #include "app_dmx.h"
 #include "app_dmx_preset.h"
 #include "app_btn.h"
 #include "app_footcontrol.h"
+#include "app_interface.h"
 #include "eal_task.h"
 #include "app_cfg.h"
 /******************************************************************************
