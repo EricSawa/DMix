@@ -83,7 +83,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOC, O_USART2_DIR_Pin|O_USART1_DIR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(O_BT_PWR_GPIO_Port, O_BT_PWR_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(O_BT_PWR_GPIO_Port, O_BT_PWR_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : PCPin PCPin */
   GPIO_InitStruct.Pin = O_USART2_DIR_Pin|O_USART1_DIR_Pin;

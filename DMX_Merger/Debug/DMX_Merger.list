@@ -26507,8 +26507,8 @@ void MX_GPIO_Init(void)
  800a286:	f7f8 f87b 	bl	8002380 <HAL_GPIO_WritePin>
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(O_BT_PWR_GPIO_Port, O_BT_PWR_Pin, GPIO_PIN_RESET);
- 800a28a:	2200      	movs	r2, #0
+  HAL_GPIO_WritePin(O_BT_PWR_GPIO_Port, O_BT_PWR_Pin, GPIO_PIN_SET);
+ 800a28a:	2201      	movs	r2, #1
  800a28c:	f44f 4100 	mov.w	r1, #32768	; 0x8000
  800a290:	f04f 4090 	mov.w	r0, #1207959552	; 0x48000000
  800a294:	f7f8 f874 	bl	8002380 <HAL_GPIO_WritePin>

@@ -1,0 +1,418 @@
+#terminal div {
+    color: gray;
+}
+
+#terminal div.out {
+    color: red;
+}
+
+#terminal div.in {
+    color: blue;
+}
+/*Loader*/
+.loaderVisable {
+  position: fixed;
+  left: 45%;
+  top: 35%;
+  border: 14px solid #f3f3f3; /* Light grey */
+  border-top: 14px solid #00aec9; /* Blue */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+}
+
+.loaderInvisable {
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* Navigation */
+.navigation{
+  display: flex;
+  height: 45px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0px solid #383838;
+  background-color: #c9a400;
+}
+.nav_col1{
+  display: flex;
+  padding-left: 23px;
+  width: 20%;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 18px;
+}
+.nav_col1text{
+  display: flex;
+  width: 50%;
+  height: 35px;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  font-family: 'Droid Sans', sans-serif;
+  color: #383838;
+  font-size: 20px;
+  font-weight: 700;
+}
+.nav_col2{
+  display: flex;
+  height: 45px;
+  width: 50%;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+.nav_col3usb{
+  display: flex;
+  height: 45px;
+  width: 10%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}
+.nav_col4bt{
+  display: flex;
+  height: 45px;
+  width: 10%;
+  justify-content: center;
+  align-items: center;
+}
+.nav_btImageVisable{
+  display: inline-block;
+  height: 60%;
+  max-width: 60%;
+  object-fit: scale-down;
+}
+.nav_btImageInvisable{
+  display: none;
+  height: 60%;
+  max-width: 60%;
+  object-fit: scale-down;
+}
+.nav_usbImageVisable{
+  display: inline-block;
+  height: 60%;
+  max-width: 60%;
+  object-fit: scale-down;
+}
+.nav_usbImageInvisable{
+  display: none;
+  height: 60%;
+  max-width: 60%;
+  object-fit: scale-down;
+}
+.nav_col5menu{
+  display: flex;
+  width: 10%;
+  justify-content: center;
+}
+/* Body */
+body{
+  background-color: #545454;
+  color: #545454;
+}
+/* Heading 1*/
+.heading-1{
+  display: flex;
+  width: 50%;
+  height: 30px;
+  margin-bottom: 10px;
+  margin-left: 25%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-style: solid;
+  border-width: 0px 0px 1px;
+  border-color: #000 #000 #00aec9;
+  font-family: 'Droid Sans', sans-serif;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+}
+/* Interface */
+.loginVisable{
+  display: block;
+}
+.loginInvisable{
+  display: none;
+}
+.interfaceVisable{
+  height: 150px;
+  margin-top: 27px;
+}
+.interfaceInvisable{
+  display: none;
+}
+.interfaceButton{
+  display: flex;
+  width: 50%;
+  height: auto;
+  float: left;
+  justify-content: center;
+  align-items: center;
+}
+.div_interfaceButton{
+  display: block;
+  width: 150px;
+  height: 150px;
+  align-items: center;
+  grid-auto-columns: 1fr;
+  grid-column-gap: 16px;
+  grid-row-gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  background-color: #00aec9;
+}
+.div_interfaceButton:hover{
+  background-color: #c9a400;
+}
+.image_interfaceButton{
+  overflow: visible;
+  width: 150px;
+  height: 40px;
+  padding-top: 35px;
+  background-color: transparent;
+  object-fit: scale-down;
+}
+.text_interfaceButton{
+  display: flex;
+  padding-top: 5px;
+  width: auto;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Droid Sans', sans-serif;
+  color: #383838;
+  font-weight: 700;
+}
+/* Preset */
+.presetVisable{
+  display: block;
+  overflow: visible;
+  height: auto;
+}
+.presetInvisable{
+  display: none;
+}
+.presetNumber{
+  height: 60px;
+}
+
+.div_preset_padding{
+  display: inline-block;
+  width: 8%;
+  height: 80px;
+  float: left;
+}
+.div_prnmbr{
+  display: inline-block;
+  width: 25%;
+  height: auto;
+  float: left;
+}
+.select_prnmbr_dropdown{
+  width: 90%;
+  height: 40px;
+  color: #383838;
+}
+.text_preset{
+  height: auto;
+  font-family: 'Droid Sans', sans-serif;
+  color: #383838;
+  font-weight: 700;
+}
+.div_prname{
+  display: inline-block;
+  width: 54.5%;
+  height:auto;
+  margin-left: 5%;
+  float: left;
+}
+.div_prname_value{
+  display: block;
+}
+.input_prname{
+  width: 100%;
+  height: 38px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 5px;
+  margin: 0;
+  border-width: 1px;
+  border-style: solid;
+  background-color: #fff;
+  color: #383838;
+}
+.form_prname{
+  display: block;
+}
+/* Transition */
+.div_transition_header{
+  height: 20px;
+}
+.text_preset_nr{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  font-family: 'Droid Sans', sans-serif;
+  color: #383838;
+  font-weight: 700;
+}
+.div_transition_nmbr{
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 8%;
+  height: 50px;
+  float: left;
+}
+
+.div_transition_ch{
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 12.5%;
+  height: 50px;
+  float: left;
+}
+.input_transition_ch{
+  height: 30px;
+  padding-left: 2%;
+  width: 70%;
+}
+
+.div_transition_start{
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 12.5%;
+  height: 50px;
+  float: left;
+}
+.input_transition_start{
+  height: 30px;
+  padding-left: 2%;
+  width: 70%;
+}
+
+.div_transition_end{
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 12.5%;
+  height: 50px;
+  float: left;
+}
+.input_transition_end{
+  height: 30px;
+  padding-left: 2%;
+  width: 70%;;
+}
+
+.div_transition_time{
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 14%;
+  height: 50px;
+  float: left;
+}
+.input_transition_time{
+  height: 30px;
+  padding-left: 2%;
+  width: 70%;
+}
+
+.div_transition_delay{
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 14%;
+  height: 50px;
+  float: left;
+
+}
+.input_transition_delay{
+  height: 30px;
+  padding-left: 2%;
+  width: 70%;
+}
+
+.div_transition_ramp{
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 14%;
+  height: 50px;
+  float: left;
+}
+.select_transition_ramp{
+  height: 35px;
+  width: 80%;
+  padding-left: 2%;
+}
+
+.div_transition_active{
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 10%;
+  height: 50px;
+  float: left;
+}
+.checkbox_transition_active{
+  display: block;
+  height: 30px;
+  margin-left: 25%;
+  margin-bottom: 5px;
+}
+/* Footswitch */
+.footswitchVisable{
+  display: block;
+}
+.footswitchInvisable{
+  display: none;
+}
+.div_footswitch_form{
+  display: block;
+  width: 50%;
+  height: 40px;
+}
+.select_footswitch_preset{
+  display: block;
+  width: 100%;
+  height: 36px;
+}
+.btn_footswitch_test{
+  display: block;
+  width: 10%;
+  height: 36px;
+  margin-left: 25px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  border-style: none;
+  background-color: #00aec9;
+  font-family: 'Droid Sans', sans-serif;
+  color: #000;
+  font-weight: 700;
+  text-align: center;
+}
+.btn_footswitch_test:hover{
+  background-color: #c9a400;
+}
+.div_footswitch_control{
+  display: flex;
+}
+.div_footswitch_empty{
+  display: block;
+  width: 5%;
+  height: 30px;
+}
+.div_footswitch_name{
+  display: block;
+  width: 15%;
+  height: 40px;
+}
