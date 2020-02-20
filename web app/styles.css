@@ -378,7 +378,22 @@ body{
   width: 50%;
   height: 40px;
 }
-.select_footswitch_preset{
+.select_footswitch_preset_pressed{
+  display: block;
+  width: 100%;
+  height: 36px;
+}
+.select_footswitch_preset_released{
+  display: block;
+  width: 100%;
+  height: 36px;
+}
+.select_footswitch_preset_hold_short{
+  display: block;
+  width: 100%;
+  height: 36px;
+}
+.select_footswitch_preset_hold_long{
   display: block;
   width: 100%;
   height: 36px;

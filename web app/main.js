@@ -11,10 +11,9 @@ let numberFootswitch = 4;
 /******************************************
 Storage
 ******************************************/
-let dictTransition = [];
-let dictPreset = [];
-let dictFootswitch = [];
-let activePreset = 0;
+let _dictPreset = [];
+let _dictFootswitch = [];
+let _activePreset = 0;
 /******************************************
 HTML Elemente
 ******************************************/
@@ -152,8 +151,8 @@ var presetTransitionHtml = [
           '<div class="text_preset">RAMP</div>',
         '</div>',
         '<div class="div_transition_value">',
-          '<select class="select_transition_ramp"  key="ramp">',
-            '<option value="linear">LIN</option>',
+          '<select class="select_transition_ramp" key="ramp">',
+            '<option value=0>LIN</option>',
           '</select>',
         '</div>',
       '</div>',
@@ -187,7 +186,7 @@ var footswitchParamsHtml = [
           '<div class="text_preset">PRESSED</div>',
         '</div>',
         '<div class="div_footswitch_form">',
-          '<select class="select_footswitch_preset"  key="preset">',
+          '<select class="select_footswitch_preset_pressed"  key="pressed">',
           '</select>',
         '</div>',
         '<button class="btn_footswitch_test" type="button">TEST</button>',
@@ -201,7 +200,7 @@ var footswitchParamsHtml = [
           '<div class="text_preset">RELEASED</div>',
         '</div>',
         '<div class="div_footswitch_form">',
-          '<select class="select_footswitch_preset"  key="preset">',
+          '<select class="select_footswitch_preset_released"  key="released">',
           '</select>',
         '</div>',
         '<button class="btn_footswitch_test" type="button">TEST</button>',
@@ -215,7 +214,7 @@ var footswitchParamsHtml = [
           '<div class="text_preset">HOLD_SHORT</div>',
         '</div>',
         '<div class="div_footswitch_form">',
-          '<select class="select_footswitch_preset"  key="preset">',
+          '<select class="select_footswitch_preset_hold_short"  key="hold_short">',
           '</select>',
         '</div>',
         '<button class="btn_footswitch_test" type="button">TEST</button>',
@@ -229,7 +228,7 @@ var footswitchParamsHtml = [
           '<div class="text_preset">HOLD_LONG</div>',
         '</div>',
         '<div class="div_footswitch_form">',
-          '<select class="select_footswitch_preset"  key="preset">',
+          '<select class="select_footswitch_preset_hold_long"  key="hold_long">',
           '</select>',
         '</div>',
         '<button class="btn_footswitch_test" type="button">TEST</button>',
@@ -241,32 +240,32 @@ var footswitchParamsHtml = [
 Storage Elemente
 ******************************************/
 function createStorage(){
-  //Generate transition dictionary
-  for (var i = 0; i < numberTransitions; i++){
-      dictTransition.push({
-        "channel": 0,
-        "startValue": 0,
-        "endValue": 0,
-        "transitionTime": 0,
-        "delay": 0,
-        "ramp": 0,
-        "active" : false
-      });
-    }
     //Generate preset array
     for(var j = 0; j < numberPresets; ++j){
-      dictPreset.push({
+      let dictTransition = [];
+      for (var i = 0; i < numberTransitions; i++){
+        dictTransition.push({
+          "channel": 0,
+          "startValue": 0,
+          "endValue": 0,
+          "transitionTime": 0,
+          "delay": 0,
+          "ramp": 0,
+          "active" : false
+        });
+      }
+      _dictPreset.push({
         "Name": "Preset " + j,
         "Params": dictTransition
       });
     }
     //Generate footswitch array
     for(var j = 0; j < numberFootswitch; ++j){
-      dictFootswitch.push({
-        "released": 255,
-        "pressed": 255,
-        "hold_short": 255,
-        "hold_long": 255,
+      _dictFootswitch.push({
+        "pressed": 0,
+        "released": 0,
+        "hold_short": 0,
+        "hold_long": 0,
       });
     }
 }
@@ -282,19 +281,28 @@ function createPresetDropdown(){
     presetNumber[0].add(opt);
   }
   //Fill Footswitch dropdown
-  presetNumberOptions = document.querySelectorAll('.select_footswitch_preset');
-  for(let i = 0; i < presetNumberOptions.length; ++i){
+  let pressedOptions = document.querySelectorAll('.select_footswitch_preset_pressed');
+  let releasedOptions = document.querySelectorAll('.select_footswitch_preset_released');
+  let holdShortOptions = document.querySelectorAll('.select_footswitch_preset_hold_short');
+  let holdLongOptions = document.querySelectorAll('.select_footswitch_preset_hold_long');
+  for(let i = 0; i < pressedOptions.length; ++i){
     for(let j = 0; j < numberPresets; ++j){
       // create new option element
-      let opt = document.createElement('option');
-      opt.value = j;
-      presetNumberOptions[i].add(opt);
+      let opt1 = document.createElement('option');
+      let opt2 = document.createElement('option');
+      let opt3 = document.createElement('option');
+      let opt4 = document.createElement('option');
+      opt1.value = opt2.value = opt3.value = opt4.value = j;
+      pressedOptions[i].add(opt1);
+      releasedOptions[i].add(opt2);
+      holdShortOptions[i].add(opt3);
+      holdLongOptions[i].add(opt4);
     }
   }
   //Update dropdown list
   updatePresetDropdown();
   //Load last NAME
-  presetName[0].value = dictPreset[activePreset].Name;
+  presetName[0].value = _dictPreset[_activePreset].Name;
 }
 
 function updatePresetDropdown(){
@@ -302,14 +310,23 @@ function updatePresetDropdown(){
   let presetNumberOptions = document.querySelectorAll('.select_prnmbr_dropdown');
   let options = presetNumberOptions[0].options;
   for(let i = 0; i < options.length; ++i){
-    options[i].text = i + " - [" + dictPreset[i].Name + "]";
+    options[i].text = i + " - [" + _dictPreset[i].Name + "]";
   }
   //Update Footswitch dropdown
-  presetNumberOptions = document.querySelectorAll('.select_footswitch_preset');
-  for(let i = 0; i < presetNumberOptions.length; ++i){
-    options = presetNumberOptions[i].options;
-    for(let j = 0; j < options.length; ++j){
-      options[j].text = j + " - [" + dictPreset[j].Name + "]";
+  let pressedOptions = document.querySelectorAll('.select_footswitch_preset_pressed');
+  let releasedOptions = document.querySelectorAll('.select_footswitch_preset_released');
+  let holdShortOptions = document.querySelectorAll('.select_footswitch_preset_hold_short');
+  let holdLongOptions = document.querySelectorAll('.select_footswitch_preset_hold_long');
+  for(let i = 0; i < pressedOptions.length; ++i){
+    let newPressedOptions = pressedOptions[i].options;
+    let newReleasedOptions = releasedOptions[i].options;
+    let newHoldShortOptions = holdShortOptions[i].options;
+    let newHoldLongOptions = holdLongOptions[i].options;
+    for(let j = 0; j < newPressedOptions.length; ++j){
+      newPressedOptions[j].text = j + " - [" + _dictPreset[j].Name + "]";
+      newReleasedOptions[j].text = j + " - [" + _dictPreset[j].Name + "]";
+      newHoldShortOptions[j].text = j + " - [" + _dictPreset[j].Name + "]";
+      newHoldLongOptions[j].text = j + " - [" + _dictPreset[j].Name + "]";
     }
   }
 }
@@ -322,6 +339,7 @@ function onTransitionChange(){
   let value = this.value;
   let key = this.getAttribute('key');
   let idx = this.getAttribute('idx');
+  //Clamp values
   if(this.getAttribute('key') == "active"){
       value = this.checked;
       min = 0;
@@ -332,27 +350,60 @@ function onTransitionChange(){
   }else if(value < min){
       this.value = min;
   }
-  console.log("transition:" + idx + " key:" + key  + " value:" + value);
+  //Load values into storage
+  _dictPreset[_activePreset]["Params"][idx][key] = value;
+  console.log(_dictPreset[_activePreset]["Params"][idx]);
 }
 
 function onPresetNumberChange(){
-  activePreset = this.value;
-  let presetName = document.querySelectorAll('.input_prname');
-  console.log("preset: " + activePreset + " name: " + dictPreset[activePreset].Name);
-  presetName[0].value = dictPreset[activePreset].Name;
+  //Change presetNumber
+  _activePreset = this.value;
+  updatePreset();
 }
+
+function updatePreset(){
+  let presetName = document.querySelectorAll('.input_prname');
+  let presetNumber = document.querySelectorAll('.select_prnmbr_dropdown');
+  presetName[0].value = _dictPreset[_activePreset].Name;
+  presetNumber[0].value = _activePreset;
+  var transitionChannel = document.querySelectorAll('.input_transition_ch');
+  var transitionStart = document.querySelectorAll('.input_transition_start');
+  var transitionEnd = document.querySelectorAll('.input_transition_end');
+  var transitionTime = document.querySelectorAll('.input_transition_time');
+  var transitionDelay = document.querySelectorAll('.input_transition_delay');
+  var transitionRamp = document.querySelectorAll('.select_transition_ramp');
+  var transitionActive = document.querySelectorAll('.checkbox_transition_active');
+  for (var i = 0; i < transitionChannel.length; i++){
+    transitionChannel[i].value = _dictPreset[_activePreset]["Params"][i]["channel"];
+    transitionStart[i].value = _dictPreset[_activePreset]["Params"][i]["startValue"];
+    transitionEnd[i].value = _dictPreset[_activePreset]["Params"][i]["endValue"];
+    transitionTime[i].value = _dictPreset[_activePreset]["Params"][i]["transitionTime"];
+    transitionDelay[i].value = _dictPreset[_activePreset]["Params"][i]["delay"];
+    transitionRamp[i].value = _dictPreset[_activePreset]["Params"][i]["ramp"];
+    transitionActive[i].checked = _dictPreset[_activePreset]["Params"][i]["active"];
+  }
+}
+
 function onPresetNameChange(){
   presetName = this.value;
-  dictPreset[activePreset].Name = presetName;
-  console.log("preset: " + activePreset + " name: " + dictPreset[activePreset].Name);
+  _dictPreset[_activePreset].Name = presetName;
   updatePresetDropdown();
+}
+
+function onFootswitchChange(){
+  let key = this.getAttribute('key');
+  let idx = this.getAttribute('idx');
+  let value = this.value;
+  //Load values into storage
+  _dictFootswitch[idx][key] = value;
+  console.log(_dictFootswitch[idx]);
 }
 
  // TODO: onFootswitchChange
  // TODO: Tabs select
  // TODO: Define protocoll
  // TODO: Print protocoll on change
- 
+
 /******************************************
 Generate Page
 ******************************************/
@@ -401,24 +452,6 @@ function insertPreset(){
     transitionActive[i].onchange = onTransitionChange;
   }
 }
-function loadPreset(presetNumber){
-  var transitionChannel = document.querySelectorAll('.input_transition_ch');
-  var transitionStart = document.querySelectorAll('.input_transition_start');
-  var transitionEnd = document.querySelectorAll('.input_transition_end');
-  var transitionTime = document.querySelectorAll('.input_transition_time');
-  var transitionDelay = document.querySelectorAll('.input_transition_delay');
-  var transitionRamp = document.querySelectorAll('.select_transition_ramp');
-  var transitionActive = document.querySelectorAll('.checkbox_transition_active');
-  for (var i = 0; i < transitionChannel.length; i++){
-    transitionChannel[i].setAttribute('preset', presetNumber);
-    transitionStart[i].setAttribute('preset', presetNumber);
-    transitionEnd[i].setAttribute('preset', presetNumber);
-    transitionTime[i].setAttribute('preset', presetNumber);
-    transitionDelay[i].setAttribute('preset', presetNumber);
-    transitionRamp[i].setAttribute('preset', presetNumber);
-    transitionActive[i].setAttribute('preset', presetNumber);
-  }
-}
 
 function insertFootswitch(){
   document.body.insertAdjacentHTML( 'beforeend', footswitchHtml );
@@ -427,30 +460,22 @@ function insertFootswitch(){
     x[0].insertAdjacentHTML('beforeend', footswitchParamsHtml );
   }
   var footswitchHeader = document.querySelectorAll('.div_footswitch_param > .heading-1');
-  // var transitionChannel = document.querySelectorAll('.input_transition_ch');
-  // var transitionStart = document.querySelectorAll('.input_transition_start');
-  // var transitionEnd = document.querySelectorAll('.input_transition_end');
-  // var transitionTime = document.querySelectorAll('.input_transition_time');
-  // var transitionDelay = document.querySelectorAll('.input_transition_delay');
-  // var transitionRamp = document.querySelectorAll('.select_transition_ramp');
-  // var transitionActive = document.querySelectorAll('.checkbox_transition_active');
+  var footswitchPresetSelectPressed = document.querySelectorAll('.select_footswitch_preset_pressed');
+  var footswitchPresetSelectReleased = document.querySelectorAll('.select_footswitch_preset_released');
+  var footswitchPresetSelectHoldShort = document.querySelectorAll('.select_footswitch_preset_hold_short');
+  var footswitchPresetSelectHoldLong = document.querySelectorAll('.select_footswitch_preset_hold_long');
+
+
   for (var i = 0; i < footswitchHeader.length; i++){
-    //Count up the transisiton number
     footswitchHeader[i].innerHTML = "- FOOTSWITCH " + (i + 1) + " -";
-  //  transitionChannel[i].setAttribute('idx', i);
-    // transitionChannel[i].onchange = onTransitionChange;
-    // transitionStart[i].setAttribute('idx', i);
-    // transitionStart[i].onchange = onTransitionChange;
-    // transitionEnd[i].setAttribute('idx', i);
-    // transitionEnd[i].onchange = onTransitionChange;
-    // transitionTime[i].setAttribute('idx', i);
-    // transitionTime[i].onchange = onTransitionChange;
-    // transitionDelay[i].setAttribute('idx', i);
-    // transitionDelay[i].onchange = onTransitionChange;
-    // transitionRamp[i].setAttribute('idx', i);
-    // transitionRamp[i].onchange = onTransitionChange;
-    // transitionActive[i].setAttribute('idx', i);
-    // transitionActive[i].onchange = onTransitionChange;
+    footswitchPresetSelectPressed[i].setAttribute('idx', i);
+    footswitchPresetSelectPressed[i].onchange = onFootswitchChange;
+    footswitchPresetSelectReleased[i].setAttribute('idx', i);
+    footswitchPresetSelectReleased[i].onchange = onFootswitchChange;
+    footswitchPresetSelectHoldShort[i].setAttribute('idx', i);
+    footswitchPresetSelectHoldShort[i].onchange = onFootswitchChange;
+    footswitchPresetSelectHoldLong[i].setAttribute('idx', i);
+    footswitchPresetSelectHoldLong[i].onchange = onFootswitchChange;
   }
 }
 
@@ -506,18 +531,17 @@ function setLoaderInvisable(){
 
 function loadHtml() {
     createStorage();
-    console.log(dictPreset);
-    console.log(dictFootswitch);
     insertNavigation();
     insertLogin();
     insertPreset();
     insertFootswitch();
-    loadPreset(2);
+
     setLoginVisable();
     setPresetVisable();
     setFootswitchVisable();
 
     createPresetDropdown();
+    updatePreset();
 }
 
 /******************************************
