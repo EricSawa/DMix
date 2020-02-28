@@ -17,17 +17,35 @@ let _activePreset = 0;
 /******************************************
 HTML Elemente
 ******************************************/
+// TODO: Gray div while loading
+// TODO: Define protocoll
+// TODO: Print protocoll on change
+
+
 // Navigation Bar
 var navigationHtml = [
   '<div class="loaderInvisable"></div>',
+  '<div class="grey_overlayInvisable"></div>',
   '<div class="navigation w-row">',
-    '<div class ="nav_col1 w-col w-col-2 w-col-small-2 w-col-tiny-2">',
+    '<div class ="nav_col1 ">',
       '<div class="nav_col1text">DMiX</div>',
     '</div>',
-    '<div class="nav_col2 w-col w-col-6 w-col-small-6 w-col-tiny-6"></div>',
-    '<div class="nav_col3usb w-col w-col-1 w-col-small-1 w-col-tiny-1"><img src="images/usb.png" alt="" class="nav_usbImageInvisable" ></div>',
-    '<div class="nav_col4bt w-col w-col-1 w-col-small-1 w-col-tiny-1"><img src="images/bt.png" alt="" class="nav_btImageInvisable" onclick="bt_onDisconnection()"></div>',
-    '<div class="nav_col5menu w-col w-col-2 w-col-small-2 w-col-tiny-2"></div>',
+    '<div class="nav_colVisable">',
+      '<div class="nav_colConTo">',
+        '<div class="nav_col2text">Connected: </div>',
+      '</div>',
+      '<div class="nav_colCon">',
+        '<img src="images/usb.png" alt="" class="nav_usbImageInvisable" >',
+        '<img src="images/bt.png" alt="" class="nav_btImageVisable" onclick="bt_onDisconnection()">',
+      '</div>',
+      '<div class="nav_colSpace"></div>',
+      '<div class="nav_colPreset" onclick="page_preset()">',
+        '<div class="text_nav">PRESET</div>',
+      '</div>',
+      '<div class="nav_colFootswitch" onclick="page_footswitch()">',
+        '<div class="text_nav">FOOTSWITCH</div>',
+      '</div>',
+    '</div>',
   '</div>'
 ].join("\n");
 // Login Screen
@@ -399,11 +417,17 @@ function onFootswitchChange(){
   console.log(_dictFootswitch[idx]);
 }
 
- // TODO: onFootswitchChange
- // TODO: Tabs select
- // TODO: Define protocoll
- // TODO: Print protocoll on change
+function page_preset(){
+  setLoginInvisable();
+  setFootswitchInvisable();
+  setPresetVisable();
+}
 
+function page_footswitch(){
+  setLoginInvisable();
+  setPresetInvisable();
+  setFootswitchVisable();
+}
 /******************************************
 Generate Page
 ******************************************/
@@ -518,16 +542,63 @@ function setFootswitchInvisable(){
 }
 function setLoaderVisable(){
   let x = document.getElementsByClassName("loaderInvisable");
+  let y = document.getElementsByClassName("grey_overlayInvisable");
   if(x.length){
     x[0].className = "loaderVisable";
+    y[0].className = "grey_overlayVisable";
   }
 }
 function setLoaderInvisable(){
   let x = document.getElementsByClassName("loaderVisable");
+  let y = document.getElementsByClassName("grey_overlayVisable");
   if(x.length){
     x[0].className = "loaderInvisable";
+    y[0].className = "grey_overlayInvisable";
   }
 }
+
+function setNavigationVisable(){
+  let x = document.getElementsByClassName("nav_colInvisable");
+  if(x.length){
+    x[0].className = "nav_colVisable";
+  }
+}
+function setNavigationInvisable(){
+  let x = document.getElementsByClassName("nav_colVisable");
+  if(x.length){
+    x[0].className = "nav_colInvisable";
+  }
+}
+function setConIconVisable(icon){
+  if(icon == "bt"){
+    let x = document.getElementsByClassName("nav_btImageInvisable");
+    if(x.length){
+      x[0].className = "nav_btImageVisable";
+    }
+  }
+  else if (icon == "usb") {
+    let x = document.getElementsByClassName("nav_usbImageInvisable");
+    if(x.length){
+      x[0].className = "nav_usbImageVisable";
+    }
+  }
+}
+
+function setConIconInvisable(icon){
+  if(icon == "bt"){
+    let x = document.getElementsByClassName("nav_btImageVisable");
+    if(x.length){
+      x[0].className = "nav_btImageInvisable";
+    }
+  }
+  else if (icon == "usb") {
+    let x = document.getElementsByClassName("nav_usbImageVisable");
+    if(x.length){
+      x[0].className = "nav_usbImageInvisable";
+    }
+  }
+}
+
 
 function loadHtml() {
     createStorage();
@@ -536,6 +607,9 @@ function loadHtml() {
     insertPreset();
     insertFootswitch();
 
+    setLoaderInvisable();
+
+    setNavigationVisable();
     setLoginVisable();
     setPresetVisable();
     setFootswitchVisable();
@@ -544,6 +618,27 @@ function loadHtml() {
     updatePreset();
 }
 
+/******************************************
+On connection
+******************************************/
+function bt_onConnection(){
+  setLoaderInvisable();
+  setLoginInvisable();
+  setFootswitchInvisable();
+  setPresetVisable();
+  setConIconVisable("bt");
+  setConIconInvisable("usb");
+}
+
+function bt_onDisconnection(data){
+  bt_disconnect();
+  setLoaderInvisable();
+  setLoginVisable();
+  setFootswitchInvisable();
+  setPresetInvisable();
+  setConIconInvisable("bt");
+  console.log(data);
+}
 /******************************************
 Helper
 ******************************************/
@@ -709,29 +804,4 @@ function bt_send(data) {
 
 function bt_writeToCharacteristic(characteristic, data) {
   characteristic.writeValue(new TextEncoder().encode(data));
-}
-
-function bt_onConnection(){
-  setLoaderInvisable();
-  setLoginInvisable();
-  setFootswitchInvisable();
-  setPresetVisable();
-  //Shot BT icon
-  let x = document.getElementsByClassName("nav_btImageInvisable");
-  if(x.length){
-    x[0].className = "nav_btImageVisable";
-  }
-}
-
-function bt_onDisconnection(data){
-  bt_disconnect();
-  setLoaderInvisable();
-  setLoginVisable();
-  setFootswitchInvisable();
-  setPresetInvisable();
-  let x = document.getElementsByClassName("nav_btImageVisable");
-  if(x.length){
-    x[0].className = "nav_btImageInvisable";
-  }
-  console.log(data);
 }
