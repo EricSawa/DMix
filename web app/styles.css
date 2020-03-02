@@ -236,10 +236,10 @@ body{
   grid-row-gap: 16px;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
-  background-color: #00aec9;
+  background-color: #c9a400;
 }
 .div_interfaceButton:hover{
-  background-color: #c9a400;
+  background-color: #A68500;
 }
 .image_interfaceButton{
   overflow: visible;
@@ -466,7 +466,8 @@ body{
   width: 100%;
   height: 36px;
 }
-.btn_footswitch_test{
+.btn_footswitch_preset_pressed, .btn_footswitch_preset_released,
+.btn_footswitch_preset_hold_short, .btn_footswitch_preset_hold_long{
   display: block;
   width: 10%;
   height: 36px;
@@ -477,14 +478,14 @@ body{
   align-items: center;
   border-radius: 5px;
   border-style: none;
-  background-color: #00aec9;
+  background-color: #c9a400;
   font-family: 'Droid Sans', sans-serif;
   color: #000;
   font-weight: 700;
   text-align: center;
 }
 .btn_footswitch_test:hover{
-  background-color: #c9a400;
+  background-color: #A68500;
 }
 .div_footswitch_control{
   display: flex;

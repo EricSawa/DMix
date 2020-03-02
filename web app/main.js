@@ -17,10 +17,9 @@ let _activePreset = 0;
 /******************************************
 HTML Elemente
 ******************************************/
-// TODO: Gray div while loading
-// TODO: Define protocoll
-// TODO: Print protocoll on change
-
+// TODO: Parse command into struct
+// TODO: Send load config command
+// TODO: Add wait after sending command
 
 // Navigation Bar
 var navigationHtml = [
@@ -90,7 +89,7 @@ var presetHtml = [
         '</div>',
         '<div class="div_prname_value">',
           '<form id="form_prname" onSubmit="return false;">',
-            '<input class="input_prname" type="text" placeholder="Example Preset">',
+            '<input class="input_prname" type="text" placeholder="Example Preset" maxlength="18">',
           '</form>',
         '</div>',
       '</div>',
@@ -207,7 +206,7 @@ var footswitchParamsHtml = [
           '<select class="select_footswitch_preset_pressed"  key="pressed">',
           '</select>',
         '</div>',
-        '<button class="btn_footswitch_test" type="button">TEST</button>',
+        '<button class="btn_footswitch_preset_pressed" type="button" key="pressed">TEST</button>',
       '</div>',
     '</div>',
     //Released
@@ -221,7 +220,7 @@ var footswitchParamsHtml = [
           '<select class="select_footswitch_preset_released"  key="released">',
           '</select>',
         '</div>',
-        '<button class="btn_footswitch_test" type="button">TEST</button>',
+        '<button class="btn_footswitch_preset_released" type="button" key="released">TEST</button>',
       '</div>',
     '</div>',
     //Hold short
@@ -235,7 +234,7 @@ var footswitchParamsHtml = [
           '<select class="select_footswitch_preset_hold_short"  key="hold_short">',
           '</select>',
         '</div>',
-        '<button class="btn_footswitch_test" type="button">TEST</button>',
+        '<button class="btn_footswitch_preset_hold_short" type="button" key="hold_short">TEST</button>',
       '</div>',
     '</div>',
     //Hold long
@@ -249,7 +248,7 @@ var footswitchParamsHtml = [
           '<select class="select_footswitch_preset_hold_long"  key="hold_long">',
           '</select>',
         '</div>',
-        '<button class="btn_footswitch_test" type="button">TEST</button>',
+        '<button class="btn_footswitch_preset_hold_long" type="button" key="hold_long">TEST</button>',
       '</div>',
     '</div>',
   '</div>',
@@ -368,8 +367,10 @@ function onTransitionChange(){
   }else if(value < min){
       this.value = min;
   }
+  value = this.value;
   //Load values into storage
   _dictPreset[_activePreset]["Params"][idx][key] = value;
+  protocoll_sendTransition(_activePreset, idx);
   console.log(_dictPreset[_activePreset]["Params"][idx]);
 }
 
@@ -377,6 +378,30 @@ function onPresetNumberChange(){
   //Change presetNumber
   _activePreset = this.value;
   updatePreset();
+}
+
+function onPresetNameChange(){
+  presetName = this.value;
+  _dictPreset[_activePreset].Name = presetName;
+  protocoll_sendPresetName(_activePreset, presetName);
+  updatePresetDropdown();
+}
+
+function onFootswitchChange(){
+  let key = this.getAttribute('key');
+  let idx = this.getAttribute('idx');
+  let value = this.value;
+  //Load values into storage
+  _dictFootswitch[idx][key] = value;
+  protocoll_sendFootswitch(idx);
+  //console.log(_dictFootswitch[idx]);
+}
+
+function onFootswitchTest(){
+  let key = this.getAttribute('key');
+  let idx = this.getAttribute('idx');
+  protocoll_sendPresetTrigger(_dictFootswitch[idx][key])
+  //console.log(_dictFootswitch[idx]);
 }
 
 function updatePreset(){
@@ -402,20 +427,7 @@ function updatePreset(){
   }
 }
 
-function onPresetNameChange(){
-  presetName = this.value;
-  _dictPreset[_activePreset].Name = presetName;
-  updatePresetDropdown();
-}
 
-function onFootswitchChange(){
-  let key = this.getAttribute('key');
-  let idx = this.getAttribute('idx');
-  let value = this.value;
-  //Load values into storage
-  _dictFootswitch[idx][key] = value;
-  console.log(_dictFootswitch[idx]);
-}
 
 function page_preset(){
   setLoginInvisable();
@@ -488,8 +500,10 @@ function insertFootswitch(){
   var footswitchPresetSelectReleased = document.querySelectorAll('.select_footswitch_preset_released');
   var footswitchPresetSelectHoldShort = document.querySelectorAll('.select_footswitch_preset_hold_short');
   var footswitchPresetSelectHoldLong = document.querySelectorAll('.select_footswitch_preset_hold_long');
-
-
+  var footswitchTestPressed = document.querySelectorAll('.btn_footswitch_preset_pressed');
+  var footswitchTestReleased = document.querySelectorAll('.btn_footswitch_preset_released');
+  var footswitchTestHoldShort = document.querySelectorAll('.btn_footswitch_preset_hold_short');
+  var footswitchTestHoldLong = document.querySelectorAll('.btn_footswitch_preset_hold_long');
   for (var i = 0; i < footswitchHeader.length; i++){
     footswitchHeader[i].innerHTML = "- FOOTSWITCH " + (i + 1) + " -";
     footswitchPresetSelectPressed[i].setAttribute('idx', i);
@@ -500,6 +514,14 @@ function insertFootswitch(){
     footswitchPresetSelectHoldShort[i].onchange = onFootswitchChange;
     footswitchPresetSelectHoldLong[i].setAttribute('idx', i);
     footswitchPresetSelectHoldLong[i].onchange = onFootswitchChange;
+    footswitchTestPressed[i].setAttribute('idx', i);
+    footswitchTestReleased[i].setAttribute('idx', i);
+    footswitchTestHoldShort[i].setAttribute('idx', i);
+    footswitchTestHoldLong[i].setAttribute('idx', i);
+    footswitchTestPressed[i].onclick = onFootswitchTest;
+    footswitchTestReleased[i].onclick = onFootswitchTest;
+    footswitchTestHoldShort[i].onclick = onFootswitchTest;
+    footswitchTestHoldLong[i].onclick = onFootswitchTest;
   }
 }
 
@@ -640,14 +662,75 @@ function bt_onDisconnection(data){
   console.log(data);
 }
 /******************************************
+Protocoll
+******************************************/
+function protocoll_sendFootswitch(fsNr){
+    let pressed = _dictFootswitch[fsNr]["pressed"];
+    let released = _dictFootswitch[fsNr]["released"];
+    let hold_short = _dictFootswitch[fsNr]["hold_short"];
+    let hold_long = _dictFootswitch[fsNr]["hold_long"];
+    let presetNameCmdStr1 = "#F0"+byteToHex(fsNr)+byteToHex(pressed)+byteToHex(released)+byteToHex(hold_short)+byteToHex(hold_long)+"0\r";
+    //TODO: Send via interface
+    console.log(presetNameCmdStr1);
+}
+function protocoll_sendTransition(prNr, trNr){
+  let ch = _dictPreset[prNr]["Params"][trNr]["channel"];
+  let start = _dictPreset[prNr]["Params"][trNr]["startValue"];
+  let end = _dictPreset[prNr]["Params"][trNr]["endValue"];
+  let time = _dictPreset[prNr]["Params"][trNr]["transitionTime"];
+  let delay = _dictPreset[prNr]["Params"][trNr]["delay"];
+  let ramp = _dictPreset[prNr]["Params"][trNr]["ramp"];
+  let active = _dictPreset[prNr]["Params"][trNr]["active"];
+  let presetNameCmdStr1 = "#T0"+byteToHex(prNr)+byteToHex(trNr)+byteToHex(ch)+byteToHex(start)+byteToHex(end)+"0\r";
+  let presetNameCmdStr2 = "#T1"+byteToHex(prNr)+byteToHex(trNr)+byteToHex(end)+shortToHex(time)+"0\r";
+  let presetNameCmdStr3 = "#T2"+byteToHex(prNr)+byteToHex(trNr)+shortToHex(delay)+byteToHex(ramp)+nibbleToHex(active)+"\r";
+  //TODO: Send via interface
+  console.log(presetNameCmdStr1);
+  console.log(presetNameCmdStr2);
+  console.log(presetNameCmdStr3);
+}
+function protocoll_sendPresetTrigger(prNr){
+    let presetNameCmdStr1 = "#PT"+byteToHex(prNr)+"000000000\r";
+    //TODO: Send via interface
+    console.log(presetNameCmdStr1);
+}
+function protocoll_sendPresetName(prNr, name){
+  let stringName = name.padEnd(18,' ')
+  let presetNameCmdStr1 = "#P0" + byteToHex(prNr) + stringName.substring(0, 9) + "\r";
+  let presetNameCmdStr2 = "#P1" + byteToHex(prNr) + stringName.substring(9, 18) + "\r";
+  //TODO: Send via interface
+  console.log(presetNameCmdStr1);
+  console.log(presetNameCmdStr2);
+}
+/******************************************
 Helper
 ******************************************/
+var nibbleToHex = function (byte) {
+  var hex = Number(byte).toString(16);
+  return hex;
+};
+var byteToHex = function (byte) {
+  var hex = Number(byte).toString(16);
+  while (hex.length < 2) {
+       hex = "0" + hex;
+  }
+  return hex;
+};
+var shortToHex = function (short) {
+  var hex = Number(short).toString(16);
+  while (hex.length < 4) {
+       hex = "0" + hex;
+  }
+  return hex;
+};
+
+
 // Event listener to the form
-sendForm.addEventListener('submit', function(event) {
-  event.preventDefault();
-  bt_send(inputField.value);
-  inputField.focus();
-});
+// sendForm.addEventListener('submit', function(event) {
+//   event.preventDefault();
+//   bt_send(inputField.value);
+//   inputField.focus();
+// });
 
 let deviceCache = null;
 let characteristicCache = null;
