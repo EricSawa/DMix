@@ -1,21 +1,24 @@
-let terminalContainer = document.getElementById('terminal');
-let sendForm = document.getElementById('send-form');
-let inputField = document.getElementById('input');
-
 /******************************************
 Definitions
 ******************************************/
-let numberTransitions = 20;
-let numberPresets = 10;
-let numberFootswitch = 4;
+const numberTransitions = 20;
+const numberPresets = 10;
+const numberFootswitch = 4;
+/******************************************
+Interface
+******************************************/
+const noneInterface = "none";
+const btInterface = "bt";
+const usbInterface = "usb";
+let interface = noneInterface;
 /******************************************
 Storage
 ******************************************/
 let _dictPreset = [];
 let _dictFootswitch = [];
 let _activePreset = 0;
-// TODO: Send load config command
-// TODO: Add wait after sending command
+
+// TODO: Add repeated send out in a loop and compare arriving messages
 
 function onPageLoad() {
     insertNavigation();
@@ -26,24 +29,10 @@ function onPageLoad() {
     createStorage();
     createPresetDropdown();
     updatePreset();
-    
+
     setLoaderInvisable();
-    setNavigationVisable();
+    setNavigationInvisable();
     setLoginVisable();
-    setPresetVisable();
-    setFootswitchVisable();
-
-    protocoll_parseFootswitch("#F0000102030A0\r");
-    protocoll_parseFootswitch("#F001010203040\r");
-
-    protocoll_parseTransition("#T00101ff03000\r");
-    protocoll_parseTransition("#T101017fffff0\r");
-    protocoll_parseTransition("#T201017fff7f1\r");
-
-    protocoll_parsePresetName("#P001EricPrese\r");
-    protocoll_parsePresetName("#P101t123     \r");
-
-    protocoll_sendLoadConfig();
 }
 /******************************************
 Logic
@@ -73,7 +62,7 @@ function onTransitionChange(){
   //Load values into storage
   _dictPreset[_activePreset]["Params"][idx][key] = value;
   protocoll_sendTransition(_activePreset, idx);
-  console.log(_dictPreset[_activePreset]["Params"][idx]);
+  //console.log(_dictPreset[_activePreset]["Params"][idx]);
 }
 
 function onPresetNumberChange(){
@@ -146,26 +135,56 @@ function updateFootswitch(){
 On connection
 ******************************************/
 function bt_onConnection(){
-  setLoaderInvisable();
   setLoginInvisable();
   setFootswitchInvisable();
   setPresetVisable();
+  setNavigationVisable();
   setConIconVisable("bt");
   setConIconInvisable("usb");
+  interface = btInterface;
+  protocoll_sendLoadConfig();
 }
 
 function bt_onDisconnection(data){
   bt_disconnect();
   setLoaderInvisable();
+  setNavigationInvisable();
   setLoginVisable();
   setFootswitchInvisable();
   setPresetInvisable();
   setConIconInvisable("bt");
   console.log(data);
+  interface = noneInterface;
+}
+
+function usb_onConnection(){
+  setLoginInvisable();
+  setFootswitchInvisable();
+  setNavigationVisable();
+  setPresetVisable();
+  setConIconVisable("usb");
+  setConIconInvisable("bt");
+  interface = usbInterface;
+  protocoll_sendLoadConfig();
+}
+function usb_onDisconnection(){
+  usb_disconnect();
+  setLoaderInvisable();
+  setNavigationInvisable();
+  setLoginVisable();
+  setFootswitchInvisable();
+  setPresetInvisable();
+  setConIconInvisable("usb");
+  interface = noneInterface;
+}
+function protocoll_onConfigReceived(){
+  setLoaderInvisable();
 }
 /******************************************
 Protocoll
 ******************************************/
+const protocoll_commandLength = 14;
+const protocoll_configCommandNmbr = 1;
 /*Footswitch messages*/
 function protocoll_sendFootswitch(fsNr){
     let pressed = _dictFootswitch[fsNr]["pressed"];
@@ -173,8 +192,8 @@ function protocoll_sendFootswitch(fsNr){
     let hold_short = _dictFootswitch[fsNr]["hold_short"];
     let hold_long = _dictFootswitch[fsNr]["hold_long"];
     let cmdStr1 = "#F0"+byteToHex(fsNr)+byteToHex(pressed)+byteToHex(released)+byteToHex(hold_short)+byteToHex(hold_long)+"0\r";
-    //TODO: Send via interface
-    console.log(cmdStr1);
+    //console.log(cmdStr1);
+    protocoll_sendToBuffer(cmdStr1);
 }
 function protocoll_parseFootswitch(command){
   let header = command.substring(0, 3);
@@ -199,10 +218,12 @@ function protocoll_sendTransition(prNr, trNr){
   let cmdStr1 = "#T0"+byteToHex(prNr)+byteToHex(trNr)+byteToHex(ch)+byteToHex(start)+"000\r";
   let cmdStr2 = "#T1"+byteToHex(prNr)+byteToHex(trNr)+byteToHex(end)+shortToHex(time)+"0\r";
   let cmdStr3 = "#T2"+byteToHex(prNr)+byteToHex(trNr)+shortToHex(delay)+byteToHex(ramp)+nibbleToHex(active)+"\r";
-  //TODO: Send via interface
-  console.log(cmdStr1);
-  console.log(cmdStr2);
-  console.log(cmdStr3);
+  // console.log(cmdStr1);
+  // console.log(cmdStr2);
+  // console.log(cmdStr3);
+  protocoll_sendToBuffer(cmdStr1);
+  protocoll_sendToBuffer(cmdStr2);
+  protocoll_sendToBuffer(cmdStr3);
 }
 function protocoll_parseTransition(command){
   let header = command.substring(0, 3);
@@ -225,16 +246,17 @@ function protocoll_parseTransition(command){
 /*Preset messages*/
 function protocoll_sendPresetTrigger(prNr){
     let cmdStr1 = "#PT"+byteToHex(prNr)+"000000000\r";
-    //TODO: Send via interface
-    console.log(cmdStr1);
+    // console.log(cmdStr1);
+    protocoll_sendToBuffer(cmdStr1);
 }
 function protocoll_sendPresetName(prNr){
   let stringName = _dictPreset[prNr].Name.padEnd(18,' ');
   let cmdStr1 = "#P0" + byteToHex(prNr) + stringName.substring(0, 9) + "\r";
   let cmdStr2 = "#P1" + byteToHex(prNr) + stringName.substring(9, 18) + "\r";
-  //TODO: Send via interface
-  console.log(cmdStr1);
-  console.log(cmdStr2);
+  // console.log(cmdStr1);
+  // console.log(cmdStr2);
+  protocoll_sendToBuffer(cmdStr1);
+  protocoll_sendToBuffer(cmdStr2);
 }
 function protocoll_parsePresetName(command){
   let header = command.substring(0, 3);
@@ -249,14 +271,118 @@ function protocoll_parsePresetName(command){
   updatePreset();
 }
 /*Load configuration messages*/
+let protocoll_configCounter = 0;
+let protocoll_configLoopID = 0;
+let protocoll_configLoopTimeout = 0;
 function protocoll_sendLoadConfig(){
-    let cmdStr1 = "#L0"+"00000000000\r";
+    let cmdStr1 = "#L0"+"000000000000";
+    protocoll_configCounter = 0;
+    protocoll_sendToInterface(cmdStr1);
+    protocoll_configLoopTimeout = 300;
+    protocoll_configLoopID = setInterval(protocoll_configLoop, 10);
+    /*Special case send directly to interface and count answers*/
     //TODO: Send via interface
-    console.log(cmdStr1);
+    // console.log(cmdStr1);
+}
+function protocoll_configLoop(){
+  if(protocoll_configCounter >= protocoll_configCommandNmbr){
+    clearInterval(protocoll_configLoopID);
+    protocoll_onConfigReceived();
+  }else if(--protocoll_configLoopTimeout <= 0){
+     protocoll_sendLoadConfig();
+  }
+
 }
 /*Protocoll helper*/
 function protocoll_clamp(num, min, max){
   return num <= min ? min : num >= max ? max : num;
+}
+
+
+function protocoll_sendToInterface(command){
+  command = command.substring(0,protocoll_commandLength);
+  if(interface == usbInterface){
+    console.log("USB TX:" + command + ", size:" + command.length);
+    usb_write(command);
+  }
+}
+
+let protocoll_txLoopRuns = false;
+let protocoll_txLoopID = 0;
+let protocoll_txBuffer = [];
+function protocoll_sendToBuffer(command){
+  protocoll_txBuffer.push(command);
+  if(!protocoll_txLoopRuns){
+    protocoll_txLoopRuns = true;
+    protocoll_txLoopID = setInterval(protocoll_txLoop, 10);
+  }
+  if(protocoll_txBuffer.length > 100){
+    console.log("Waring: tx buffer is quite full");
+  }
+}
+
+function protocoll_txLoop(){
+  if(protocoll_txBuffer.length > 0){
+     protocoll_sendToInterface(protocoll_txBuffer[0]);
+  }else{
+    protocoll_txLoopRuns = false;
+    clearInterval(protocoll_txLoopID);
+  }
+}
+
+let protocoll_lastSendCommand = "";
+let protocoll_commandCnt = 0;
+let protocoll_commandNext = "";
+let protocoll_commandFound = false;
+
+function protocoll_parseToCommand(receivedData){
+  for(let i = 0; i < receivedData.length; ++i){
+    if(receivedData[i] == '#'){
+      protocoll_commandCnt = 1;
+      protocoll_commandNext = "";
+      protocoll_commandNext += receivedData[i];
+      protocoll_commandFound = true;
+    }else{
+      if(protocoll_commandFound){
+        ++protocoll_commandCnt;
+        protocoll_commandNext += receivedData[i];
+        if(protocoll_commandCnt >= protocoll_commandLength){
+          protocoll_spreadCommand(protocoll_commandNext);
+          protocoll_commandCnt = 0;
+          protocoll_commandFound = false;
+        }
+      }
+    }
+  }
+}
+
+function protocoll_spreadCommand(command){
+  console.log("Found: " + command + ", size:" + command.length);
+  if(protocoll_getType(command) == 'T'){
+    protocoll_parseTransition(command);
+  }else if(protocoll_getType(command) == 'F'){
+    protocoll_parseFootswitch(command);
+  }else if(protocoll_getType(command) == 'P'){
+    protocoll_parsePresetName(command);
+  }
+  protocoll_compareLastTxWithRx(command);
+  ++protocoll_configCounter;
+}
+
+function protocoll_compareLastTxWithRx(command){
+  if(protocoll_txBuffer.length > 0){
+     if(command == protocoll_txBuffer[0].substring(0,protocoll_commandLength)){
+       protocoll_txBuffer.shift();
+     }
+  }
+}
+
+/* Helper */
+function protocoll_getType(command){
+  return command[1];
+}
+function protocoll_getIndex(command){
+  return command[2];
 }
 /******************************************
 Helper
@@ -280,7 +406,109 @@ var shortToHex = function (short) {
   return hex;
 };
 
+/******************************************
+USB Logic
+******************************************/
+let usbPort = {};
+let usbReader = {};
+let usbWriter = {};
 
+async function usb_connect(){
+  const requestOptions = {
+    // Filter on devices with the Arduino USB vendor ID.
+    filters: [{ 'vendorId': 0x0484 }],
+  };
+  // Request an Arduino from the user.
+  try{
+    usbPort = await navigator.serial.requestPort(requestOptions);
+  }catch(err){
+    console.log("No port selected");
+    return;
+  }
+  setLoaderVisable();
+  // Port found try to open and read
+  try{
+    await usbPort.open({baudrate: 9600});
+    usb_readLoop();
+    usb_addWriter();
+    usb_onConnection();
+  } catch (err){
+    console.log("USB port open not possible");
+    usb_onDisconnection();
+  }
+}
+
+function usb_disconnect(){
+  usb_cancelReaderWriter();
+  usb_close();
+}
+
+function usb_addWriter(){
+  usbWriter = usbPort.writable.getWriter();
+}
+async function usb_write(command){
+  const encoder = new TextEncoder();
+  await usbWriter.write(encoder.encode(command));
+}
+
+async function usb_readLoop(){
+  try{
+    const decoder = new TextDecoder();
+    while (usbPort.readable) {
+      usbReader = usbPort.readable.getReader();
+      while (true) {
+        let value, done;
+        try {
+          ({ value, done } = await usbReader.read());
+        } catch (error) { // Handle |error|...
+          console.log("USB read loop error");
+          await usbReader.cancel();
+          usb_onDisconnection();
+          break;
+        }
+        if (done) { // |reader| has been canceled.
+          console.log("USB read loop done");
+          await usbReader.cancel();
+          usb_onDisconnection();
+          usb_close();
+          break;
+        }
+        // Do something with |value|...
+        let data = decoder.decode(value);
+        //console.log("USB RX:" + data + ", size:" + data.length);
+        protocoll_parseToCommand(data);
+      }
+      usb_onDisconnection();
+      usb_close();
+      usbReader.releaseLock();
+    }
+  }
+  catch(err){
+    console.log("USB read loop not readable");
+    usb_onDisconnection();
+    usb_close();
+  }
+}
+
+async function usb_cancelReaderWriter(){
+  usbWriter.releaseLock();
+  try{
+      await usbReader.cancel();
+      await usbWriter.close();
+      console.log("USB reader/writer canceled");
+  }catch(err){
+
+  }
+}
+
+async function usb_close(){
+  try{
+    await usbPort.close();
+    console.log("USB port closed");
+  }catch(err){
+
+  }
+}
 /******************************************
 Bluetooth Logic
 ******************************************/
@@ -573,7 +801,7 @@ var navigationHtml = [
         '<div class="nav_col2text">Connected: </div>',
       '</div>',
       '<div class="nav_colCon">',
-        '<img src="images/usb.png" alt="" class="nav_usbImageInvisable" >',
+        '<img src="images/usb.png" alt="" class="nav_usbImageInvisable" onclick="usb_onDisconnection()">',
         '<img src="images/bt.png" alt="" class="nav_btImageVisable" onclick="bt_onDisconnection()">',
       '</div>',
       '<div class="nav_colSpace"></div>',
@@ -596,7 +824,7 @@ var loginHtml = [
           '<div class="text_interfaceButton">BLUETOOTH</div>',
         '</div>',
       '</div>',
-      '<div class="interfaceButton">',
+      '<div class="interfaceButton" onclick="usb_connect()">',
         '<div class="div_interfaceButton"><img src="images/usb.png" alt="" class="image_interfaceButton">',
           '<div class="text_interfaceButton">USB</div>',
         '</div>',
