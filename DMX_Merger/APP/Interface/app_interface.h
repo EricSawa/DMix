@@ -17,6 +17,7 @@
 #include "usart.h"
 #include "usbd_cdc_if.h"
 #include "app_cfg.h"
+#include "app_model.h"
 #include "app_uart.h"
 #include "app_usb.h"
 #include "configs.h"

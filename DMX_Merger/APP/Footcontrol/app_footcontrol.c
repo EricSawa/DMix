@@ -11,70 +11,11 @@
 /******************************************************************************
 * Configuration
 *******************************************************************************/
-typedef enum{
-	app_footcontrol_ACTIVE,
-	app_footcontrol_INACTIVE
-}app_footcontrol_Status;
 
-typedef enum{
-	app_footcontrol_GPIO_INPUT,
-	app_footcontrol_GPIO_OUTPUT
-}app_footcontrol_GpioMode;
-
-typedef struct{
-	uint8_t presetNr;
-	int16_t triggerValue;
-}app_footcontrol_PresetCfg;
-
-typedef struct{
-	app_footcontrol_GpioMode mode;
-	app_footcontrol_PresetCfg press;
-	app_footcontrol_PresetCfg release;
-	app_footcontrol_PresetCfg holdShort;
-	app_footcontrol_PresetCfg holdLong;
-}app_footcontrol_GpioCfg;
 
 
 /*User access*/
-app_footcontrol_Status status = app_footcontrol_ACTIVE;
-
-app_footcontrol_GpioCfg myGpios[app_cfg_NMBR_BTNS] = {
-	{.mode = app_footcontrol_GPIO_INPUT,
-	.press = {.presetNr = 0, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-//	.release = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.release = {.presetNr = 1, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdShort = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdShort = {.presetNr = 3, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdLong = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	},
-	{.mode = app_footcontrol_GPIO_INPUT,
-//	.press = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.press = {.presetNr = 0, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-//	.release = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.release = {.presetNr = 1, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdShort = {.presetNr = 3, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdLong = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	},
-	{.mode = app_footcontrol_GPIO_INPUT,
-	.press = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.release = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdShort = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdLong = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	},
-	{.mode = app_footcontrol_GPIO_INPUT,
-	.press = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.press = {.presetNr = 2, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-//	.release = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdShort = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdLong = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	},
-	{.mode = app_footcontrol_GPIO_INPUT,
-	.press = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.release = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdShort = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	.holdLong = {.presetNr = app_footcontrol_NO_PRESET, .triggerValue = app_cfg_dmx_preset_TRIGGER_ENABLE},
-	},
-};
+app_footcontrol_cfg_Status status = app_footcontrol_ACTIVE;
 /******************************************************************************
 * Variable Declarations
 *******************************************************************************/
@@ -87,7 +28,7 @@ static volatile int16_t internalTimer = 0;
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-static void sendDmxPreset(eal_task_Task *self, app_footcontrol_PresetCfg *preset);
+static void sendDmxPreset(eal_task_Task *self, app_footcontrol_cfg_PresetCfg *preset);
 /******************************************************************************
 * Function Definitions
 *******************************************************************************/
@@ -118,19 +59,19 @@ void app_footcontrol_receiveMsg(eal_task_Task *self, msg_Message *message){
 		/*Event parsing*/
 		else{
 			uint16_t idx = message->index;
-			if(myGpios[idx].mode == app_footcontrol_GPIO_INPUT){
-				if((message->value == app_cfg_btn_STAT_RELEASED) && (myGpios[idx].release.presetNr != app_footcontrol_NO_PRESET)) sendDmxPreset(self, &myGpios[idx].release);
-				else if((message->value == app_cfg_btn_STAT_PRESSED) && (myGpios[idx].press.presetNr != app_footcontrol_NO_PRESET)) sendDmxPreset(self, &myGpios[idx].press);
-				else if((message->value == app_cfg_btn_STAT_HOLD_SHORT) && (myGpios[idx].holdShort.presetNr != app_footcontrol_NO_PRESET)) sendDmxPreset(self, &myGpios[idx].holdShort);
-				else if((message->value == app_cfg_btn_STAT_HOLD_LONG) && (myGpios[idx].holdLong.presetNr != app_footcontrol_NO_PRESET)) sendDmxPreset(self, &myGpios[idx].holdLong);
+			if(app_model_model.footswitches[idx].mode == app_footcontrol_GPIO_INPUT){
+				if((message->value == app_cfg_btn_STAT_RELEASED) && (app_model_model.footswitches[idx].release.presetNr < app_cfg_NMBR_PRESETS)) sendDmxPreset(self, &app_model_model.footswitches[idx].release);
+				else if((message->value == app_cfg_btn_STAT_PRESSED) && (app_model_model.footswitches[idx].press.presetNr < app_cfg_NMBR_PRESETS)) sendDmxPreset(self, &app_model_model.footswitches[idx].press);
+				else if((message->value == app_cfg_btn_STAT_HOLD_SHORT) && (app_model_model.footswitches[idx].holdShort.presetNr < app_cfg_NMBR_PRESETS)) sendDmxPreset(self, &app_model_model.footswitches[idx].holdShort);
+				else if((message->value == app_cfg_btn_STAT_HOLD_LONG) && (app_model_model.footswitches[idx].holdLong.presetNr < app_cfg_NMBR_PRESETS)) sendDmxPreset(self, &app_model_model.footswitches[idx].holdLong);
 			}
 		}
 	}
 }
 
 /* Helper ----------------------------------------------------------------------*/
-static void sendDmxPreset(eal_task_Task *self, app_footcontrol_PresetCfg *preset){
+static void sendDmxPreset(eal_task_Task *self, app_footcontrol_cfg_PresetCfg *preset){
 	if(self->sendMsg == NULL) return;
-	msg_Message newMessage = msg_LITERAL(app_cfg_DMX_PRESET_MSG, msg_ACTION(preset->presetNr), preset->triggerValue, 0, 0);
+	msg_Message newMessage = msg_LITERAL(app_cfg_DMX_PRESET_MSG, msg_ACTION(preset->presetNr - 1), preset->triggerValue, 0, 0);
 	self->sendMsg(self, &newMessage);
 }

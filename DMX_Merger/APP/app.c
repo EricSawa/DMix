@@ -11,9 +11,9 @@
 #include <stdlib.h>
 #include "main.h"
 #include "app.h"
-#define JSMN_HEADER
-#include "jsmn.h"
 
+//TODO: Parse load config
+//TODO: Send transitions on upload
 /******************************************************************************
 * Constants
 *******************************************************************************/
@@ -34,7 +34,6 @@
 * Function Prototypes
 *******************************************************************************/
 /* Callback's ----------------------------------------------------------------*/
-uint8_t eepromCallback(eeprom_cfg_Config *config);
 /* Helper --------------------------------------------------------------------*/
 static void sendMessage(eal_task_Task *self, msg_Message *message);
 static void messageBufferError(uint8_t state);
@@ -77,13 +76,17 @@ eal_task_Task footcontrolTask = {
 };
 eal_task_Task interfaceTask = {
 		.id = 5, .enable = false,
-		.init = app_interface_init, .mainLoop = app_interface_process, .timer = NULL,
+		.init = app_interface_init, .mainLoop = app_interface_process, .timer = app_interface_cyclic1ms,
 		.sendMsg = sendMessage, .receiveMsg = app_interface_receiveMsg
+};
+eal_task_Task eepromTask = {
+		.id = 6, .enable = false,
+		.init = app_eeprom_init, .mainLoop = app_eeprom_process, .timer = app_eeprom_cyclic1ms,
+		.sendMsg = sendMessage, .receiveMsg = app_eeprom_receiveMsg
 };
 /******************************************************************************
 * Function Definitions
 *******************************************************************************/
-#define SOFT_I2C	1
 void app_main(){
 	msgTask.enable = true;
 	msgTask.init(&msgTask);
@@ -91,7 +94,7 @@ void app_main(){
 		msgTask.mainLoop(&msgTask);
 		btnTask.mainLoop(&btnTask);
 		footcontrolTask.mainLoop(&footcontrolTask);
-
+		eepromTask.mainLoop(&eepromTask);
 		dmxTask.mainLoop(&dmxTask);
 		dmxPresetTask.mainLoop(&dmxPresetTask);
 		interfaceTask.mainLoop(&interfaceTask);
@@ -106,6 +109,8 @@ void app_1ms(){
 	if(dmxTask.timer) dmxTask.timer(&dmxTask, true);
 	if(dmxPresetTask.timer) dmxPresetTask.timer(&dmxPresetTask, true);
 	if(btnTask.timer) btnTask.timer(&btnTask, true);
+	if(eepromTask.timer) eepromTask.timer(&eepromTask, true);
+	if(interfaceTask.timer) interfaceTask.timer(&interfaceTask, true);
 	if(++timer100ms >= 100){
 		timer100ms = 0;
 	}
@@ -126,14 +131,14 @@ static void app_receiveMsg(eal_task_Task *self, msg_Message *message){
 	dmxTask.receiveMsg(&dmxTask, message);
 	dmxPresetTask.receiveMsg(&dmxPresetTask, message);
 	btnTask.receiveMsg(&btnTask, message);
+	eepromTask.receiveMsg(&eepromTask, message);
 	footcontrolTask.receiveMsg(&footcontrolTask, message);
 	interfaceTask.receiveMsg(&interfaceTask, message);
 }
 
 static void app_init(eal_task_Task *self){
-	i2c_soft_init(&softI2C2);
-	eeprom_registerCallback(&eepromDev1, eepromCallback);
-	eeprom_init(&eepromDev1);
+	eepromTask.enable = true;
+	if(eepromTask.init) eepromTask.init(&eepromTask);
 	dmxTask.enable = true;
 	if(dmxTask.init) dmxTask.init(&dmxTask);
 	dmxPresetTask.enable = true;
@@ -160,19 +165,7 @@ static void messageBufferError(uint8_t state){
 }
 
 /* Callback's ---------------------------------------------------------------------*/
-uint8_t eepromCallback(eeprom_cfg_Config *config){
-	uint8_t state = 1;
-	if(config->callbackType == EEPROM_CFG_CALL_TX_START){
-		if(i2c_soft_mem_write(&softI2C2, config->devAddr, config->memAddr, I2C_MEMADD_SIZE_16BIT, config->txBuffer, config->dataSize) != soft_i2c_RETURN_OK) state = 0;
-	}
-	if(config->callbackType == EEPROM_CFG_CALL_RX_START){
-		if(i2c_soft_mem_read(&softI2C2, config->devAddr, config->memAddr, I2C_MEMADD_SIZE_16BIT, config->rxBuffer, config->dataSize) != soft_i2c_RETURN_OK) state = 0;
-	}
-	if(config->callbackType == EEPROM_CFG_CALL_CHECK_TX_STATE){
-		if(i2c_soft_write(&softI2C2, config->devAddr, config->rxBuffer, config->dataSize) != soft_i2c_RETURN_OK) state = 0;
-	}
-	return state;
-}
+
 
 /* IRQs ---------------------------------------------------------------------*/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
@@ -182,7 +175,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 void TIM1_UP_TIM16_IRQHandler(void){
   if (__HAL_TIM_GET_FLAG(&htim16, TIM_FLAG_UPDATE) != RESET){
 	  __HAL_TIM_CLEAR_IT(&htim16, TIM_IT_UPDATE);
-	  i2c_soft_timer_us(&softI2C2);
+	  //i2c_soft_timer_us(&softI2C2);
   }
 }
 

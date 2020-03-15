@@ -12,10 +12,11 @@
 *******************************************************************************/
 #include <stdint.h>
 #include <stdbool.h>
+#include "app_cfg.h"
 /******************************************************************************
 * Constants
 *******************************************************************************/
-#define app_dmx_preset_cfg_NMBR_TRANSITIONS 20
+#define app_dmx_preset_cfg_NMBR_TRANSITIONS app_cfg_NMBR_TRANSITIONS
 /******************************************************************************
 * Typedefs
 *******************************************************************************/
@@ -49,6 +50,7 @@ typedef struct{
 }app_dmx_preset_cfg_TransitionStatus;
 
 typedef struct{
+	char name[19];
 	bool trigger;
 	uint32_t relTime_ms;		/*Starts to count when preset is triggered. Can be used to check transition delays*/
 	uint32_t transitionDoneCnt;	/*Will be used to check how many transitions are already done*/
@@ -57,6 +59,7 @@ typedef struct{
 	app_dmx_preset_cfg_TransitionStatus presetTransitionStatus[app_dmx_preset_cfg_NMBR_TRANSITIONS];
 }app_dmx_preset_cfg_Preset;
 
+#define app_dmx_preset_cfg_PRESET_SIZE sizeof(app_dmx_preset_cfg_Preset)
 
 
 #endif /* DMX_PRESET_APP_DMX_PRESET_CFG_H_ */

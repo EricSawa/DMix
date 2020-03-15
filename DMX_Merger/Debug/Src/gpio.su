@@ -1,5 +1,5 @@
 gpio.c:70:6:MX_GPIO_Init	48	static
-gpio.c:139:6:gpio_ConfigureToFloating	40	static
-gpio.c:146:6:gpio_ConfigureToPushPull	40	static
-gpio.c:166:6:gpio_setPinMode	40	static
-gpio.c:186:6:gpio_setPinMode2	16	static
+gpio.c:153:6:gpio_ConfigureToFloating	40	static
+gpio.c:160:6:gpio_ConfigureToPushPull	40	static
+gpio.c:180:6:gpio_setPinMode	40	static
+gpio.c:200:6:gpio_setPinMode2	16	static

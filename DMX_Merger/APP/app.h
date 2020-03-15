@@ -15,16 +15,14 @@
 #include <stdint.h>
 #include "gpio.h"
 #include "usart.h"
-#include "i2c.h"
 #include "configs.h"
-#include <dmx.h>
-#include "soft_i2c.h"
-#include "eeprom.h"
+#include "dmx.h"
 #include "app_dmx.h"
 #include "app_dmx_preset.h"
 #include "app_btn.h"
 #include "app_footcontrol.h"
 #include "app_interface.h"
+#include "app_eeprom.h"
 #include "eal_task.h"
 #include "app_cfg.h"
 /******************************************************************************

@@ -25,7 +25,7 @@
  */
 void eeprom_registerCallback(eeprom_cfg_Config *config, eeprom_cfg_callback callback);
 void eeprom_init(eeprom_cfg_Config *config);
-void eeprom_write(eeprom_cfg_Config *config, uint16_t startAddr, uint8_t *data, uint8_t dataSize);
+void eeprom_write(eeprom_cfg_Config *config, uint16_t startAddr, uint8_t *data, uint16_t dataSize);
 bool eeprom_isFree(eeprom_cfg_Config *config);
 void eeprom_read(eeprom_cfg_Config *config, uint16_t startAddr, uint8_t *data, uint16_t dataSize);
 

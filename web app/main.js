@@ -2,7 +2,7 @@
 Definitions
 ******************************************/
 const numberTransitions = 20;
-const numberPresets = 10;
+const numberPresets = 11;
 const numberFootswitch = 4;
 /******************************************
 Interface
@@ -29,10 +29,13 @@ function onPageLoad() {
     createStorage();
     createPresetDropdown();
     updatePreset();
+    updateFootswitch();
 
     setLoaderInvisable();
     setNavigationInvisable();
     setLoginVisable();
+    protocoll_parseFootswitch("#F00101010203");
+    protocoll_parseFootswitch("#F001FF010203");
 }
 /******************************************
 Logic
@@ -125,11 +128,15 @@ function updateFootswitch(){
   let holdShortOptions = document.querySelectorAll('.select_footswitch_preset_hold_short');
   let holdLongOptions = document.querySelectorAll('.select_footswitch_preset_hold_long');
   for(let i = 0; i < pressedOptions.length; ++i){
-    pressedOptions[i].selectedIndex = _dictFootswitch[i]["pressed"];
-    releasedOptions[i].selectedIndex =_dictFootswitch[i]["released"];
-    holdShortOptions[i].selectedIndex = _dictFootswitch[i]["hold_short"];
-    holdLongOptions[i].selectedIndex = _dictFootswitch[i]["hold_long"];
+    pressedOptions[i].selectedIndex = clamp(_dictFootswitch[i]["pressed"], 0, numberPresets-1);
+    releasedOptions[i].selectedIndex =clamp(_dictFootswitch[i]["released"], 0, numberPresets-1);
+    holdShortOptions[i].selectedIndex = clamp(_dictFootswitch[i]["hold_short"], 0, numberPresets-1);
+    holdLongOptions[i].selectedIndex = clamp(_dictFootswitch[i]["hold_long"], 0, numberPresets-1);
   }
+}
+
+function clamp(num, min, max){
+  return num <= min ? min : num >= max ? max : num;
 }
 /******************************************
 On connection
@@ -184,7 +191,7 @@ function protocoll_onConfigReceived(){
 Protocoll
 ******************************************/
 const protocoll_commandLength = 14;
-const protocoll_configCommandNmbr = 1;
+const protocoll_configCommandNmbr = 0;
 /*Footswitch messages*/
 function protocoll_sendFootswitch(fsNr){
     let pressed = _dictFootswitch[fsNr]["pressed"];
@@ -269,6 +276,7 @@ function protocoll_parsePresetName(command){
     _dictPreset[prNr].Name = newString + command.substring(5, 14);
   }
   updatePreset();
+  updatePresetDropdownContent();
 }
 /*Load configuration messages*/
 let protocoll_configCounter = 0;
@@ -314,7 +322,7 @@ function protocoll_sendToBuffer(command){
   protocoll_txBuffer.push(command);
   if(!protocoll_txLoopRuns){
     protocoll_txLoopRuns = true;
-    protocoll_txLoopID = setInterval(protocoll_txLoop, 10);
+    protocoll_txLoopID = setInterval(protocoll_txLoop, 100);
   }
   if(protocoll_txBuffer.length > 100){
     console.log("Waring: tx buffer is quite full");
@@ -475,7 +483,7 @@ async function usb_readLoop(){
         }
         // Do something with |value|...
         let data = decoder.decode(value);
-        //console.log("USB RX:" + data + ", size:" + data.length);
+        console.log("USB RX:" + data + ", size:" + data.length);
         protocoll_parseToCommand(data);
       }
       usb_onDisconnection();
@@ -1025,7 +1033,7 @@ Generate Page and Storage
 ******************************************/
 function createStorage(){
     //Generate preset array
-    for(var j = 0; j < numberPresets; ++j){
+    for(var j = 0; j < numberPresets-1; ++j){
       let dictTransition = [];
       for (var i = 0; i < numberTransitions; i++){
         dictTransition.push({
@@ -1046,10 +1054,10 @@ function createStorage(){
     //Generate footswitch array
     for(var j = 0; j < numberFootswitch; ++j){
       _dictFootswitch.push({
-        "pressed": 0,
-        "released": 0,
-        "hold_short": 0,
-        "hold_long": 0,
+        "pressed": numberPresets,
+        "released": numberPresets,
+        "hold_short": numberPresets,
+        "hold_long": numberPresets,
       });
     }
 }
@@ -1058,7 +1066,7 @@ function createPresetDropdown(){
   let presetNumber = document.querySelectorAll('.select_prnmbr_dropdown');
   let presetName = document.querySelectorAll('.input_prname');
   //Fill PRESET dropdown list
-  for(let j = 0; j < numberPresets; ++j){
+  for(let j = 0; j < numberPresets-1; ++j){
     // create new option element
     let opt = document.createElement('option');
     opt.value = j;
@@ -1070,7 +1078,7 @@ function createPresetDropdown(){
   let holdShortOptions = document.querySelectorAll('.select_footswitch_preset_hold_short');
   let holdLongOptions = document.querySelectorAll('.select_footswitch_preset_hold_long');
   for(let i = 0; i < pressedOptions.length; ++i){
-    for(let j = 0; j < numberPresets; ++j){
+    for(let j = 0; j < numberPresets-1; ++j){
       // create new option element
       let opt1 = document.createElement('option');
       let opt2 = document.createElement('option');
@@ -1082,6 +1090,16 @@ function createPresetDropdown(){
       holdShortOptions[i].add(opt3);
       holdLongOptions[i].add(opt4);
     }
+    // create none option element
+    let opt1 = document.createElement('option');
+    let opt2 = document.createElement('option');
+    let opt3 = document.createElement('option');
+    let opt4 = document.createElement('option');
+    opt1.value = opt2.value = opt3.value = opt4.value = numberPresets;
+    pressedOptions[i].add(opt1);
+    releasedOptions[i].add(opt2);
+    holdShortOptions[i].add(opt3);
+    holdLongOptions[i].add(opt4);
   }
   //Update dropdown list
   updatePresetDropdownContent();
@@ -1106,12 +1124,16 @@ function updatePresetDropdownContent(){
     let newReleasedOptions = releasedOptions[i].options;
     let newHoldShortOptions = holdShortOptions[i].options;
     let newHoldLongOptions = holdLongOptions[i].options;
-    for(let j = 0; j < newPressedOptions.length; ++j){
+    for(let j = 0; j < newPressedOptions.length-1; ++j){
       newPressedOptions[j].text = j + " - [" + _dictPreset[j].Name + "]";
       newReleasedOptions[j].text = j + " - [" + _dictPreset[j].Name + "]";
       newHoldShortOptions[j].text = j + " - [" + _dictPreset[j].Name + "]";
       newHoldLongOptions[j].text = j + " - [" + _dictPreset[j].Name + "]";
     }
+    newPressedOptions[newPressedOptions.length-1].text = "None";
+    newReleasedOptions[newPressedOptions.length-1].text = "None";
+    newHoldShortOptions[newPressedOptions.length-1].text = "None";
+    newHoldLongOptions[newPressedOptions.length-1].text = "None";
   }
 }
 /* Generate Page */

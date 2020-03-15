@@ -1,0 +1,15 @@
+app_eeprom.c:44:6:app_eeprom_init	16	static
+app_eeprom.c:56:6:app_eeprom_process	16	static
+app_eeprom.c:67:6:app_eeprom_cyclic1ms	16	static
+app_eeprom.c:72:6:app_eeprom_receiveMsg	16	static
+app_eeprom.c:75:13:writeVersion	24	static
+app_eeprom.c:85:17:readVersion	16	static
+app_eeprom.c:93:13:erase	280	static
+app_eeprom.c:104:13:storeModel	16	static
+app_eeprom.c:119:13:readModel	16	static
+app_eeprom.c:133:13:storePreset	928	static
+app_eeprom.c:149:13:readPreset	928	static
+app_eeprom.c:165:13:storeFootswitch	368	static
+app_eeprom.c:176:13:readFootswitch	368	static
+app_eeprom.c:188:13:writeUntilLastEEPROMWriteFinished	8	static
+app_eeprom.c:199:9:eepromCallback	48	static

@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "app_dmx_preset_cfg.h"
+#include "app_model.h"
 #include "eal_task.h"
 #include "configs.h"
 /******************************************************************************

@@ -129,6 +129,20 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(O_USART1_BREAK_GPIO_Port, &GPIO_InitStruct);
 
+  GPIO_InitStruct.Pin = O_PWM_LED3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(O_PWM_LED3_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(O_PWM_LED3_GPIO_Port, O_PWM_LED3_Pin, GPIO_PIN_SET);
+
+  GPIO_InitStruct.Pin = O_PWM_LED2_Pin|O_PWM_LED1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(GPIOB, O_PWM_LED2_Pin|O_PWM_LED1_Pin, GPIO_PIN_SET);
+
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
