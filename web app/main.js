@@ -18,7 +18,9 @@ let _dictPreset = [];
 let _dictFootswitch = [];
 let _activePreset = 0;
 
-// TODO: Add repeated send out in a loop and compare arriving messages
+// TODO: Add bluetooth transmission and reception
+// TODO: Verify load config. Maybe add message counter
+// TODO: Maybe request the config all 10s
 
 function onPageLoad() {
     insertNavigation();
@@ -483,7 +485,7 @@ async function usb_readLoop(){
         }
         // Do something with |value|...
         let data = decoder.decode(value);
-        console.log("USB RX:" + data + ", size:" + data.length);
+        //console.log("USB RX:" + data + ", size:" + data.length);
         protocoll_parseToCommand(data);
       }
       usb_onDisconnection();

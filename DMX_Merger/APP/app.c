@@ -12,8 +12,7 @@
 #include "main.h"
 #include "app.h"
 
-//TODO: Parse load config
-//TODO: Send transitions on upload
+//TODO: Send disconnect if activePreset changes
 /******************************************************************************
 * Constants
 *******************************************************************************/

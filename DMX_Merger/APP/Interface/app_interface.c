@@ -79,6 +79,7 @@ static void checkInterfaces(eal_task_Task *self);
 static void parseCommand(eal_task_Task *self, app_interface_CmdInterface *interface, char data);
 static bool commandFound(eal_task_Task *self, char *command);
 static bool parseTransition(eal_task_Task *self, char *command);
+static bool sendTransition(eal_task_Task *self, uint8_t index);
 static bool parseFootswitch(eal_task_Task *self, char *command);
 static bool sendFootswitch(eal_task_Task *self, uint8_t index);
 static bool parsePreset(eal_task_Task *self, char *command);
@@ -203,6 +204,28 @@ static bool parseTransition(eal_task_Task *self, char *command){
 	}
 	return true;
 }
+static bool sendTransition(eal_task_Task *self, uint8_t index){
+	uint8_t prNr = index/app_cfg_NMBR_TRANSITIONS;
+	uint8_t trNr = index - (prNr*app_cfg_NMBR_TRANSITIONS);
+	uint8_t ch = app_model_model.presets[prNr].presetTransitionSettings[trNr].dmxCh;
+	uint8_t start = app_model_model.presets[prNr].presetTransitionSettings[trNr].dmxStartVal;
+	uint8_t end = app_model_model.presets[prNr].presetTransitionSettings[trNr].dmxEndVal;
+	uint16_t time = app_model_model.presets[prNr].presetTransitionSettings[trNr].transTime_ms;
+	uint16_t delay = app_model_model.presets[prNr].presetTransitionSettings[trNr].transDelay_ms;
+	uint8_t ramp = app_model_model.presets[prNr].presetTransitionSettings[trNr].transRamp;
+	bool active = app_model_model.presets[prNr].presetTransitionSettings[trNr].enable;
+	char cmdString[15] = "";
+	snprintf(cmdString, sizeof(cmdString),"#T0%02x%02x%02x%02x000\r", prNr, trNr, ch, start);
+	cmdString[14] = '\r';
+	sendToInterface(self, activeInterface, cmdString);
+	snprintf(cmdString, sizeof(cmdString),"#T1%02x%02x%02x%04x0\r", prNr, trNr, end, time);
+	cmdString[14] = '\r';
+	sendToInterface(self, activeInterface, cmdString);
+	snprintf(cmdString, sizeof(cmdString),"#T2%02x%02x%04x%02x%01x\r", prNr, trNr, delay, ramp, active);
+	cmdString[14] = '\r';
+	sendToInterface(self, activeInterface, cmdString);
+	return true;
+}
 
 static bool parseFootswitch(eal_task_Task *self, char *command){
 	char cmdIdx = command[2];
@@ -296,7 +319,7 @@ static void uploadConfig(eal_task_Task *self){
 			uploadState = upload_PRESET_TRANSITION;
 		}
 	}else if(uploadState == upload_PRESET_TRANSITION){
-		//TODO: Send transition
+		sendTransition(self, uploadCmdCounter);
 		if(++uploadCmdCounter >= app_cfg_NMBR_PRESETS*app_cfg_NMBR_TRANSITIONS){
 			uploadCmdCounter = 0;
 			uploadState = upload_FOOTSWITCH;
