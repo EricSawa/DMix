@@ -59,7 +59,6 @@
 									<listOptionValue builtIn="false" value="../Middleware/Soft_I2C"/>
 									<listOptionValue builtIn="false" value="../APP/Btn"/>
 									<listOptionValue builtIn="false" value="../APP/Footcontrol"/>
-									<listOptionValue builtIn="false" value="../Middleware/JSMN"/>
 									<listOptionValue builtIn="false" value="../APP/Interface"/>
 									<listOptionValue builtIn="false" value="../APP/USB"/>
 									<listOptionValue builtIn="false" value="../APP/Model"/>

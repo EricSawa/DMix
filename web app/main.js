@@ -18,26 +18,28 @@ let _dictPreset = [];
 let _dictFootswitch = [];
 let _activePreset = 0;
 
+const serial = chrome.serial;
+
 // TODO: Add bluetooth transmission and reception
 // TODO: Verify load config. Maybe add message counter
 // TODO: Maybe request the config all 10s
 
 function onPageLoad() {
-    insertNavigation();
-    insertLogin();
-    insertPreset();
-    insertFootswitch();
+    if ('serial' in navigator) {
+      insertNavigation();
+      insertLogin();
+      insertPreset();
+      insertFootswitch();
 
-    createStorage();
-    createPresetDropdown();
-    updatePreset();
-    updateFootswitch();
+      createStorage();
+      createPresetDropdown();
+      updatePreset();
+      updateFootswitch();
 
-    setLoaderInvisable();
-    setNavigationInvisable();
-    setLoginVisable();
-    protocoll_parseFootswitch("#F00101010203");
-    protocoll_parseFootswitch("#F001FF010203");
+      setLoaderInvisable();
+      setNavigationInvisable();
+      setLoginVisable();
+    }
 }
 /******************************************
 Logic
@@ -192,15 +194,15 @@ function protocoll_onConfigReceived(){
 /******************************************
 Protocoll
 ******************************************/
-const protocoll_commandLength = 14;
-const protocoll_configCommandNmbr = 0;
+const protocoll_commandLength = 16;
+const protocoll_configCommandNmbr = 625;
 /*Footswitch messages*/
 function protocoll_sendFootswitch(fsNr){
     let pressed = _dictFootswitch[fsNr]["pressed"];
     let released = _dictFootswitch[fsNr]["released"];
     let hold_short = _dictFootswitch[fsNr]["hold_short"];
     let hold_long = _dictFootswitch[fsNr]["hold_long"];
-    let cmdStr1 = "#F0"+byteToHex(fsNr)+byteToHex(pressed)+byteToHex(released)+byteToHex(hold_short)+byteToHex(hold_long)+"0\r";
+    let cmdStr1 = "#F0"+byteToHex(fsNr)+byteToHex(pressed)+byteToHex(released)+byteToHex(hold_short)+byteToHex(hold_long)+"0\r\n";
     //console.log(cmdStr1);
     protocoll_sendToBuffer(cmdStr1);
 }
@@ -224,9 +226,9 @@ function protocoll_sendTransition(prNr, trNr){
   let delay = _dictPreset[prNr]["Params"][trNr]["delay"];
   let ramp = _dictPreset[prNr]["Params"][trNr]["ramp"];
   let active = _dictPreset[prNr]["Params"][trNr]["active"];
-  let cmdStr1 = "#T0"+byteToHex(prNr)+byteToHex(trNr)+byteToHex(ch)+byteToHex(start)+"000\r";
-  let cmdStr2 = "#T1"+byteToHex(prNr)+byteToHex(trNr)+byteToHex(end)+shortToHex(time)+"0\r";
-  let cmdStr3 = "#T2"+byteToHex(prNr)+byteToHex(trNr)+shortToHex(delay)+byteToHex(ramp)+nibbleToHex(active)+"\r";
+  let cmdStr1 = "#T0"+byteToHex(prNr)+byteToHex(trNr)+byteToHex(ch)+byteToHex(start)+"000\r\n";
+  let cmdStr2 = "#T1"+byteToHex(prNr)+byteToHex(trNr)+byteToHex(end)+shortToHex(time)+"0\r\n";
+  let cmdStr3 = "#T2"+byteToHex(prNr)+byteToHex(trNr)+shortToHex(delay)+byteToHex(ramp)+nibbleToHex(active)+"\r\n";
   // console.log(cmdStr1);
   // console.log(cmdStr2);
   // console.log(cmdStr3);
@@ -254,14 +256,14 @@ function protocoll_parseTransition(command){
 
 /*Preset messages*/
 function protocoll_sendPresetTrigger(prNr){
-    let cmdStr1 = "#PT"+byteToHex(prNr)+"000000000\r";
+    let cmdStr1 = "#PT"+byteToHex(prNr)+"000000000\r\n";
     // console.log(cmdStr1);
     protocoll_sendToBuffer(cmdStr1);
 }
 function protocoll_sendPresetName(prNr){
   let stringName = _dictPreset[prNr].Name.padEnd(18,' ');
-  let cmdStr1 = "#P0" + byteToHex(prNr) + stringName.substring(0, 9) + "\r";
-  let cmdStr2 = "#P1" + byteToHex(prNr) + stringName.substring(9, 18) + "\r";
+  let cmdStr1 = "#P0" + byteToHex(prNr) + stringName.substring(0, 9) + "\r\n";
+  let cmdStr2 = "#P1" + byteToHex(prNr) + stringName.substring(9, 18) + "\r\n";
   // console.log(cmdStr1);
   // console.log(cmdStr2);
   protocoll_sendToBuffer(cmdStr1);
@@ -284,11 +286,13 @@ function protocoll_parsePresetName(command){
 let protocoll_configCounter = 0;
 let protocoll_configLoopID = 0;
 let protocoll_configLoopTimeout = 0;
+let protocoll_uploadTime = 0;
 function protocoll_sendLoadConfig(){
-    let cmdStr1 = "#L0"+"000000000000";
+    let cmdStr1 = "#L0"+"00000000000\r\n";
     protocoll_configCounter = 0;
+    protocoll_uploadTime =  performance.now();
     protocoll_sendToInterface(cmdStr1);
-    protocoll_configLoopTimeout = 300;
+    protocoll_configLoopTimeout = 1000;
     protocoll_configLoopID = setInterval(protocoll_configLoop, 10);
     /*Special case send directly to interface and count answers*/
     //TODO: Send via interface
@@ -298,6 +302,8 @@ function protocoll_configLoop(){
   if(protocoll_configCounter >= protocoll_configCommandNmbr){
     clearInterval(protocoll_configLoopID);
     protocoll_onConfigReceived();
+    let t2 = performance.now();
+    console.log("Upload Time: " + (t2-protocoll_uploadTime) + "ms");
   }else if(--protocoll_configLoopTimeout <= 0){
      protocoll_sendLoadConfig();
   }
@@ -308,12 +314,26 @@ function protocoll_clamp(num, min, max){
   return num <= min ? min : num >= max ? max : num;
 }
 
+function protocoll_sendAck(){
+  console.log("Send ACK");
+  let cmdStr1 = "#A0"+"00000000000\r\n";
+  protocoll_sendToInterface(cmdStr1);
+}
+
+function protocoll_isAck(command){
+  if(protocoll_getType(command) == 'A') {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 function protocoll_sendToInterface(command){
   command = command.substring(0,protocoll_commandLength);
   if(interface == usbInterface){
-    console.log("USB TX:" + command + ", size:" + command.length);
     usb_write(command);
+  }else if(interface == btInterface){
+    bt_send(command);
   }
 }
 
@@ -356,8 +376,11 @@ function protocoll_parseToCommand(receivedData){
       if(protocoll_commandFound){
         ++protocoll_commandCnt;
         protocoll_commandNext += receivedData[i];
-        if(protocoll_commandCnt >= protocoll_commandLength){
+        if(protocoll_commandCnt >= (protocoll_commandLength)){
           protocoll_spreadCommand(protocoll_commandNext);
+          if(!protocoll_isAck(protocoll_commandNext)){
+            protocoll_sendAck();
+          }
           protocoll_commandCnt = 0;
           protocoll_commandFound = false;
         }
@@ -377,11 +400,15 @@ function protocoll_spreadCommand(command){
   }
   protocoll_compareLastTxWithRx(command);
   ++protocoll_configCounter;
+  console.log("Total RX: " + protocoll_configCounter);
 }
 
 function protocoll_compareLastTxWithRx(command){
   if(protocoll_txBuffer.length > 0){
-     if(command == protocoll_txBuffer[0].substring(0,protocoll_commandLength)){
+     // if(command == protocoll_txBuffer[0].substring(0,protocoll_commandLength)){
+     //   protocoll_txBuffer.shift();
+     // }
+     if(protocoll_getType(command) == 'A'){
        protocoll_txBuffer.shift();
      }
   }
@@ -438,7 +465,7 @@ async function usb_connect(){
   setLoaderVisable();
   // Port found try to open and read
   try{
-    await usbPort.open({baudrate: 9600});
+    await usbPort.open({baudrate: 115200, buffersize: 20000});
     usb_readLoop();
     usb_addWriter();
     usb_onConnection();
@@ -485,7 +512,7 @@ async function usb_readLoop(){
         }
         // Do something with |value|...
         let data = decoder.decode(value);
-        //console.log("USB RX:" + data + ", size:" + data.length);
+        //console.log("USB RX:" + value + ", size:" + value.length);
         protocoll_parseToCommand(data);
       }
       usb_onDisconnection();
@@ -534,6 +561,7 @@ let characteristicCache = null;
 let readBuffer = '';
 
 function bt_connect() {
+  console.log("Try to connect bluetooth");
   /* If device cache is already filled do promise, else request devices */
   return (deviceCache ? Promise.resolve(deviceCache) :
       bt_requestBluetoothDevice()).
@@ -598,10 +626,10 @@ function bt_connectDeviceAndCacheCharacteristic(device) {
 function bt_startNotifications(characteristic) {
   log('Starting notifications...');
   //Connected to a bt device
-  bt_onConnection();
   return characteristic.startNotifications().
       then(() => {
         log('Notifications started');
+        bt_onConnection();
         characteristic.addEventListener('characteristicvaluechanged',
             bt_handleCharacteristicValueChanged);
       });
@@ -609,34 +637,26 @@ function bt_startNotifications(characteristic) {
 
 function bt_handleCharacteristicValueChanged(event) {
   let value = new TextDecoder().decode(event.target.value);
-
-  for (let c of value) {
-    if (c === '\n') {
-      let data = readBuffer.trim();
-      readBuffer = '';
-
-      if (data) {
-        bt_receive(data);
-      }
-    }
-    else {
-      readBuffer += c;
-    }
-  }
+  //console.log("BT RX:" + value );
+  bt_receive(value);
 }
 
-function bt_receive(data) {
-  log(data, 'in');
-  //Here add the parser
+function bt_receive(value) {
+  //const decoder = new TextDecoder();
+  //let data = decoder.decode(value);
+  let data = value;
+  //console.log("BT RX:" + data + ", size:" + data.length);
+  protocoll_parseToCommand(data);
 }
 
 function log(data, type = '') {
-  console.log(data)
+  console.log("Bt-Log:" + data)
   // terminalContainer.insertAdjacentHTML('beforeend',
       // '<div' + (type ? ' class="' + type + '"' : '') + '>' + data + '</div>');
 }
 
 function bt_disconnect() {
+  console.log("Bt disconnect");
   if (deviceCache) {
     log('Disconnecting from "' + deviceCache.name + '" bluetooth device...');
     deviceCache.removeEventListener('gattserverdisconnected',
@@ -662,28 +682,33 @@ function bt_disconnect() {
 }
 
 function bt_send(data) {
-  data = String(data);
-  if (!data || !characteristicCache) {
-    return;
-  }
-  data += '\n';
-  if (data.length > 20) {
-    let chunks = data.match(/(.|[\r\n]){1,20}/g);
-    bt_writeToCharacteristic(characteristicCache, chunks[0]);
-    for (let i = 1; i < chunks.length; i++) {
-      setTimeout(() => {
-        bt_writeToCharacteristic(characteristicCache, chunks[i]);
-      }, i * 100);
-    }
-  }
-  else {
+  //data = String(data);
+  // if (!data || !characteristicCache) {
+  //   return;
+  // }
+  // data += '\n';
+  // if (data.length > 20) {
+  //   let chunks = data.match(/(.|[\r\n]){1,20}/g);
+  //   bt_writeToCharacteristic(characteristicCache, chunks[0]);
+  //   for (let i = 1; i < chunks.length; i++) {
+  //     setTimeout(() => {
+  //       bt_writeToCharacteristic(characteristicCache, chunks[i]);
+  //     }, i * 100);
+  //   }
+  // }
+  // else {
     bt_writeToCharacteristic(characteristicCache, data);
-  }
-  log(data, 'out');
+  // }
+  //log(data, 'out');
 }
 
 function bt_writeToCharacteristic(characteristic, data) {
-  characteristic.writeValue(new TextEncoder().encode(data));
+  console.log("Write to characteristic");
+  try{
+      characteristic.writeValue(new TextEncoder().encode(data));
+  }catch(err){
+    console.log("BT: Cant write to characteristic");
+  }
 }
 /******************************************
 HTML Visability
@@ -829,13 +854,13 @@ var loginHtml = [
   '<div class="loginInvisable">',
     '<h1 = class="heading-1">- SELECT YOUR INTERFACE - </h1>',
     '<div class="interfaceVisable">',
-      '<div class="interfaceButton" onclick="bt_connect()">',
-        '<div class="div_interfaceButton"><img src="images/bt.png" alt="" class="image_interfaceButton">',
+      '<div class="interfaceButton" >',
+        '<div class="div_interfaceButton" onclick="bt_connect()"><img src="images/bt.png" alt="" class="image_interfaceButton">',
           '<div class="text_interfaceButton">BLUETOOTH</div>',
         '</div>',
       '</div>',
-      '<div class="interfaceButton" onclick="usb_connect()">',
-        '<div class="div_interfaceButton"><img src="images/usb.png" alt="" class="image_interfaceButton">',
+      '<div class="interfaceButton">',
+        '<div class="div_interfaceButton" onclick="usb_connect()"><img src="images/usb.png" alt="" class="image_interfaceButton">',
           '<div class="text_interfaceButton">USB</div>',
         '</div>',
       '</div>',

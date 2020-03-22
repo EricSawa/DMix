@@ -12,15 +12,17 @@
 /******************************************************************************
 * Configuration
 *******************************************************************************/
-#define MAX_USB_TX_SIZE	16
+#define MAX_USB_TX_SIZE	25
 static stRingBuf app_usb_txBuf;
 static stRingBuf app_usb_rxBuf;
 static usb_app_Link linkStatus = app_usb_LINK_DOWN;
 int32_t app_usb_timer = 0;
-#define APP_USB_TIMEOUT 1000
+#define APP_USB_TIMEOUT 100
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
+void setTxBufferPointer(uint16_t in, uint16_t out);
+void getTxBufferPointer(uint16_t *in, uint16_t *out);
 void usb_irqRxHandler(char *pData, uint16_t size);
 /******************************************************************************
 * Function Definitions
@@ -55,17 +57,22 @@ void app_usb_txLoop(){
 	int size = 0;
 	if(HAL_GPIO_ReadPin(I_USB_VBUS_GPIO_Port, I_USB_VBUS_Pin)) linkStatus = app_usb_LINK_UP;
 	else linkStatus = app_usb_LINK_DOWN;
-	for(size = 0; size < MAX_USB_TX_SIZE; ++size){
-		if(app_usb_getCharFromTxBuffer(&usbData) == ringbuffer_OK){
-			usbString[size] = usbData;
-		}else break;
-	}
-	if(size > 0) {
-		if(linkStatus == app_usb_LINK_UP){
+	if(linkStatus == app_usb_LINK_UP){
+		/*Grab in out pointer*/
+		uint16_t lastIn, lastOut;
+		getTxBufferPointer(&lastIn, &lastOut);
+		/*Grab next string*/
+		for(size = 0; size < MAX_USB_TX_SIZE; ++size){
+			if(app_usb_getCharFromTxBuffer(&usbData) == ringbuffer_OK){
+				usbString[size] = usbData;
+			}else break;
+		}
+		if(size > 0) {
 			app_usb_timer = APP_USB_TIMEOUT;
 			while(app_usb_timer){
-				if(CDC_Transmit_FS((uint8_t*)usbString, size) == USBD_OK) return;
+				if(CDC_Transmit_FS((uint8_t*)usbString, size+1) == USBD_OK) return;
 			}
+			setTxBufferPointer(lastIn, lastOut);
 		}
 	}
 }
@@ -106,7 +113,15 @@ uint8_t app_usb_writeStringToBuffer(const char *string){
 	return bufferState;
 }
 
-
+/*Helper*/
+void getTxBufferPointer(uint16_t *in, uint16_t *out){
+	in = app_usb_txBuf.in;
+	out = app_usb_txBuf.out;
+}
+void setTxBufferPointer(uint16_t in, uint16_t out){
+	app_usb_txBuf.in = in;
+	app_usb_txBuf.out = out;
+}
 /* IRQ Handler*/
 void usb_irqRxHandler(char *pData, uint16_t size){
 	char buffer_state;

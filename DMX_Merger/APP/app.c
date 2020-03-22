@@ -12,7 +12,12 @@
 #include "main.h"
 #include "app.h"
 
-//TODO: Send disconnect if activePreset changes
+//TODO: Light up RED led when error occurs
+//TODO: Light up green led when message external communication occurs
+//TODO: Enable bluetooth with long press SW2
+//TODO: Add bluetooth module. Parse +connect to link up
+//TODO: Send disconnect if activeInterface changes
+//TODO: Add fader view for bluetooth. 10 fader with setable address
 /******************************************************************************
 * Constants
 *******************************************************************************/

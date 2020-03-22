@@ -241,6 +241,21 @@ body{
 .div_interfaceButton:hover{
   background-color: #A68500;
 }
+
+.div_interfaceButtonGrey{
+  display: block;
+  width: 150px;
+  height: 150px;
+  align-items: center;
+  grid-auto-columns: 1fr;
+  grid-column-gap: 16px;
+  grid-row-gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  background-color: #8a8880;
+  user-select: none;
+}
+
 .image_interfaceButton{
   overflow: visible;
   width: 150px;

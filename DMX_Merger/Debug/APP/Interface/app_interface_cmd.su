@@ -1,0 +1,6 @@
+app_interface_cmd.c:34:6:app_interface_cmd_initBuffer	16	static
+app_interface_cmd.c:39:6:app_interface_cmd_writeCmd	32	static
+app_interface_cmd.c:52:24:app_interface_cmd_getNext	24	static
+app_interface_cmd.c:62:6:app_interface_cmd_killBuffer	16	static
+app_interface_cmd.c:67:6:app_interface_cmd_parseCmd	16	static
+app_interface_cmd.c:88:6:app_interface_cmd_isAck	16	static
