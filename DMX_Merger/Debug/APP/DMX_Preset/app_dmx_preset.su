@@ -1,5 +1,5 @@
 app_dmx_preset.c:35:6:app_dmx_preset_init	24	static
 app_dmx_preset.c:43:6:app_dmx_preset_process	24	static
 app_dmx_preset.c:71:6:app_dmx_preset_cyclic1ms	16	static
-app_dmx_preset.c:75:6:app_dmx_preset_receiveMsg	40	static
-app_dmx_preset.c:109:13:performNextTransitionStep	48	static
+app_dmx_preset.c:75:6:app_dmx_preset_receiveMsg	32	static
+app_dmx_preset.c:110:13:performNextTransitionStep	48	static

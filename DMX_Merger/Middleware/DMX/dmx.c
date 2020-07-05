@@ -171,8 +171,9 @@ void dmx_irqRxTimerHandler(dmx_cfg_Instance *dmx){
 
 void dmx_irqRxInterfaceHandler(dmx_cfg_Instance *dmx){
 	uint32_t sr = dmx->uart->ISR;
+	if(sr & USART_ISR_ORE) dmx->uart->ICR |= USART_ICR_ORECF; /*Kill overrun error*/
+
 	if (sr & USART_ISR_RXNE){
-		if(sr & USART_ISR_ORE) dmx->uart->ICR |= USART_ICR_ORECF; /*Kill overrun error*/
 		uint8_t  dmxByte = (uint8_t)dmx->uart->RDR;
 		if(dmx->rxState == dmx_cfg_RX_STATE_NONE) return;
 		if(sr & USART_ISR_FE){	/*Frame error*/

@@ -72,6 +72,6 @@ void app_footcontrol_receiveMsg(eal_task_Task *self, msg_Message *message){
 /* Helper ----------------------------------------------------------------------*/
 static void sendDmxPreset(eal_task_Task *self, app_footcontrol_cfg_PresetCfg *preset){
 	if(self->sendMsg == NULL) return;
-	msg_Message newMessage = msg_LITERAL(app_cfg_DMX_PRESET_MSG, msg_ACTION(preset->presetNr - 1), preset->triggerValue, 0, 0);
+	msg_Message newMessage = msg_LITERAL(app_cfg_DMX_PRESET_MSG, msg_ACTION(preset->presetNr), app_cfg_dmx_preset_TRIGGER_ENABLE, 0, 0);
 	self->sendMsg(self, &newMessage);
 }

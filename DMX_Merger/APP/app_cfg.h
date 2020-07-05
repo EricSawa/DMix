@@ -52,11 +52,11 @@
 * Button Messages Index
 *******************************************************************************/
 /* Message */
-#define app_cfg_btn_USER_IDX	0
-#define app_cfg_btn_GPIO1_IDX	1
-#define app_cfg_btn_GPIO2_IDX	2
-#define app_cfg_btn_GPIO3_IDX	3
-#define app_cfg_btn_GPIO4_IDX	4
+#define app_cfg_btn_GPIO1_IDX	0
+#define app_cfg_btn_GPIO2_IDX	1
+#define app_cfg_btn_GPIO3_IDX	2
+#define app_cfg_btn_GPIO4_IDX	3
+#define app_cfg_btn_USER_IDX	4
 
 #define app_cfg_btn_STAT_RELEASED		0
 #define app_cfg_btn_STAT_PRESSED		1

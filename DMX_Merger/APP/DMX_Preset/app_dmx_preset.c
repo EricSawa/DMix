@@ -79,6 +79,7 @@ void app_dmx_preset_receiveMsg(eal_task_Task *self, msg_Message *message){
 			uint16_t idx = msg_KILL_ACTION_MSK(message->index);
 			if(APP_CFG_IS_INDEX_IN_RANGE(idx, app_cfg_dmx_preset_TRIGGER_PRESET_OFFSET_IDX, app_cfg_dmx_preset_TRIGGER_PRESET_OFFSET_IDX+app_cfg_NMBR_PRESETS)){
 				if((message->value == app_cfg_dmx_preset_TRIGGER_ENABLE) && (app_model_model.presets[idx].trigger == false)) {	/*Can be triggered only once*/
+					/*Start preset*/
 					app_model_model.presets[idx].trigger = true;
 					app_model_model.presets[idx].relTime_ms = 0;
 					app_model_model.presets[idx].transitionDoneCnt = 0;
@@ -88,14 +89,14 @@ void app_dmx_preset_receiveMsg(eal_task_Task *self, msg_Message *message){
 						self->sendMsg(self, &newMessage);
 					}
 				}else{
-					app_model_model.presets[idx].trigger = false;
-					app_model_model.presets[idx].relTime_ms = 0;
-					app_model_model.presets[idx].transitionDoneCnt = 0;
-					memset(app_model_model.presets[idx].presetTransitionStatus, 0, sizeof(app_model_model.presets[idx].presetTransitionStatus));
-					if(self->sendMsg != NULL){
-						msg_Message newMessage = msg_LITERAL(app_cfg_DMX_PRESET_MSG, msg_EVENT(idx), app_cfg_dmx_preset_TRIGGER_DISABLE, 0, 0);
-						self->sendMsg(self, &newMessage);
-					}
+//					app_model_model.presets[idx].trigger = false;
+//					app_model_model.presets[idx].relTime_ms = 0;
+//					app_model_model.presets[idx].transitionDoneCnt = 0;
+//					memset(app_model_model.presets[idx].presetTransitionStatus, 0, sizeof(app_model_model.presets[idx].presetTransitionStatus));
+//					if(self->sendMsg != NULL){
+//						msg_Message newMessage = msg_LITERAL(app_cfg_DMX_PRESET_MSG, msg_EVENT(idx), app_cfg_dmx_preset_TRIGGER_DISABLE, 0, 0);
+//						self->sendMsg(self, &newMessage);
+//					}
 				}
 			}
 		/*Event parsing*/

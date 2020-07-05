@@ -64,11 +64,11 @@ void app_btn_receiveMsg(eal_task_Task *self, msg_Message *message){
 
 /* Helper ----------------------------------------------------------------------*/
 static void getOthSwitches(eal_task_Task *self){
-	if(HAL_GPIO_ReadPin(I_SW2_GPIO_Port, I_SW2_Pin) == 0) 		othButtonBuffer[0] |= (1 << 0); else othButtonBuffer[0] &= ~(1 << 0);
-	if(HAL_GPIO_ReadPin(I_GPIO1_GPIO_Port, I_GPIO1_Pin) == 0) 	othButtonBuffer[0] |= (1 << 1); else othButtonBuffer[0] &= ~(1 << 1);
-	if(HAL_GPIO_ReadPin(I_GPIO2_GPIO_Port, I_GPIO2_Pin) == 0) 	othButtonBuffer[0] |= (1 << 2); else othButtonBuffer[0] &= ~(1 << 2);
-	if(HAL_GPIO_ReadPin(I_GPIO3_GPIO_Port, I_GPIO3_Pin) == 0) 	othButtonBuffer[0] |= (1 << 3); else othButtonBuffer[0] &= ~(1 << 3);
-	if(HAL_GPIO_ReadPin(I_GPIO4_GPIO_Port, I_GPIO4_Pin) == 0) 	othButtonBuffer[0] |= (1 << 4); else othButtonBuffer[0] &= ~(1 << 4);
+	if(HAL_GPIO_ReadPin(I_GPIO1_GPIO_Port, I_GPIO1_Pin) == 0) 	othButtonBuffer[0] |= (1 << 0); else othButtonBuffer[0] &= ~(1 << 0);
+	if(HAL_GPIO_ReadPin(I_GPIO2_GPIO_Port, I_GPIO2_Pin) == 0) 	othButtonBuffer[0] |= (1 << 1); else othButtonBuffer[0] &= ~(1 << 1);
+	if(HAL_GPIO_ReadPin(I_GPIO3_GPIO_Port, I_GPIO3_Pin) == 0) 	othButtonBuffer[0] |= (1 << 2); else othButtonBuffer[0] &= ~(1 << 2);
+	if(HAL_GPIO_ReadPin(I_GPIO4_GPIO_Port, I_GPIO4_Pin) == 0) 	othButtonBuffer[0] |= (1 << 3); else othButtonBuffer[0] &= ~(1 << 3);
+	if(HAL_GPIO_ReadPin(I_SW2_GPIO_Port, I_SW2_Pin) == 0) 		othButtonBuffer[0] |= (1 << 4); else othButtonBuffer[0] &= ~(1 << 4);
 
 }
 
