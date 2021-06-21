@@ -466,12 +466,12 @@ async function usb_connect() {
   setLoaderVisable();
   // Port found try to open and read
   try {
-    await usbPort.open({ baudrate: 115200, buffersize: 20000 });
+    await usbPort.open({ baudRate: 115200, buffersize: 20000 });
     usb_readLoop();
     usb_addWriter();
     usb_onConnection();
   } catch (err) {
-    console.log("USB port open not possible");
+    console.log("USB port open not possible:" + err);
     usb_onDisconnection();
   }
 }
@@ -532,6 +532,7 @@ async function usb_cancelReaderWriter() {
   usbWriter.releaseLock();
   try {
     await usbReader.cancel();
+    await usbReader.releaseLock();
     await usbWriter.close();
     console.log("USB reader/writer canceled");
   } catch (err) {
