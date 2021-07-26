@@ -12,6 +12,11 @@
 /******************************************************************************
 * Configuration
 *******************************************************************************/
+#define USB_RX_SIZE 256
+#define USB_TX_SIZE 256
+static char usbRxData[USB_RX_SIZE] = {0};
+static char usbTxData[USB_TX_SIZE] = {0};
+
 #define MAX_USB_TX_SIZE	25
 static stRingBuf app_usb_txBuf;
 static stRingBuf app_usb_rxBuf;
@@ -31,6 +36,8 @@ void app_usb_init(){
 	usb_registerRxCallback(usb_irqRxHandler);
 	linkStatus = app_usb_LINK_DOWN;
 	app_usb_timer = 0;
+	app_usb_rxBufferInit(usbRxData, sizeof(usbRxData));
+	app_usb_rxBufferInit(usbRxData, sizeof(usbRxData));
 }
 
 void app_usb_rxBufferInit(char *data, uint16_t size){
