@@ -453,7 +453,7 @@ let usbWriter = {};
 async function usb_connect() {
   const requestOptions = {
     // Filter on devices with the Arduino USB vendor ID.
-    //filters: [{ 'vendorId': 0x0484 }],
+    //filters: [{ 'usbVendorId': 0x0484 }],
   };
   // Request an Arduino from the user.
   try {
