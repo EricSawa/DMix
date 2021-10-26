@@ -1,10 +1,4 @@
-
-
-
-
-
-
-# DMiX - Master of the DMX Universe
+# DMiX - Artist Light Control
 
 ![](pics/DMiX.png)
 
